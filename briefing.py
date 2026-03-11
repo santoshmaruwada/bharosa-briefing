@@ -363,18 +363,29 @@ def send_email(html_content):
     today = datetime.now().strftime("%B %d, %Y")
     subject = f"Bharosa Intel — {today}"
 
+    recipients = [
+        "santosh@bharosa.finance",
+        "prachi.khushlani@bharosa.finance",
+        "arjit@bharosa.finance",
+        "lynelle@bharosa.finance",
+        "ujjwal@bharosa.finance",
+        "sahil@bharosa.finance",
+    ]
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"Bharosa Intel <{GMAIL_USER}>"
-    msg["To"] = TO_EMAIL
+    msg["To"] = ", ".join(recipients)
 
+    plain_text = f"Bharosa Intel — {today}\n\nOpen in an HTML email client to view."
+    msg.attach(MIMEText(plain_text, "plain"))
     msg.attach(MIMEText(html_content, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-        server.sendmail(GMAIL_USER, TO_EMAIL, msg.as_string())
+        server.sendmail(GMAIL_USER, recipients, msg.as_string())
 
-    print(f"Sent to {TO_EMAIL}")
+    print(f"Sent to {len(recipients)} recipients")
 
 
 if __name__ == "__main__":
