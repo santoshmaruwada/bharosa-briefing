@@ -68,7 +68,7 @@ def generate_briefing():
     
     response = client.messages.create(
         model="claude-opus-4-6",
-        max_tokens=2000,
+        max_tokens=4000,
         system=SYSTEM_PROMPT,
         tools=[{"type": "web_search_20250305", "name": "web_search"}],
         messages=[{
