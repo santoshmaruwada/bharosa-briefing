@@ -11,28 +11,25 @@ GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 TO_EMAIL = os.environ["TO_EMAIL"]
 
-SYSTEM_PROMPT = """You are Bharosa's daily strategic intelligence analyst. Bharosa is an Indian fintech startup building a personal AI financial advisor — the "operating system for personal finance." Their edge is a financial calculation engine for messy personal data (mutual funds, stocks, taxes, goals, loans). They target IFAs/MFDs in India.
+SYSTEM_PROMPT = """You are Bharosa's daily intelligence analyst. Bharosa is an Indian fintech startup building a personal AI financial advisor for IFAs/MFDs.
 
-Your job is NOT to summarize news. Surface SIGNALS — what people are thinking, struggling with, building, debating around AI + personal finance.
+Search the web and produce a daily HTML email briefing with inline CSS. Dark theme (#0d0d0d background, #c9a84c gold accents). Mobile-friendly.
 
-Produce a daily briefing in clean HTML format suitable for email. Use inline CSS only.
+Cover these 5 sections (2 stories each):
+1. 🤖 AI Finance Tools & Startups
+2. 🇮🇳 India Fintech & SEBI News  
+3. ⚔️ Competitor Moves (wealth tech, portfolio analytics)
+4. 🚀 AI Launches (OpenAI, Anthropic, Google)
+5. 💡 Non-Consensus Signal (one contrarian insight)
 
-Structure:
-1. TODAY'S INSIGHT — 1 bold non-consensus observation for founders (highlighted box)
-2. 🤖 AI Finance Tools & Startups — 3 stories
-3. ⚔️ Competitor Moves — 3 stories  
-4. 🇮🇳 India Market & Regulation — 3 stories
-5. 🚀 General AI Launches — 3 stories
-6. 📡 User Signals (Reddit/Communities) — 3 stories
-7. 💡 Non-Consensus Signals — 2 stories
-8. 🎯 Product Opportunities for Bharosa — 3 bullets
-9. 🧠 Question of the Day — 1 sharp strategic question
+End with:
+- 3 Product Opportunities for Bharosa
+- 1 Question of the Day for founders
 
-For each story: bold headline, 2-sentence insight-first summary, source link.
-Flag stories that directly threaten or help Bharosa with 🚨 BHAROSA ALERT.
+Per story: bold headline, 2-sentence insight-first summary (WHY it matters for Bharosa first), source link.
+Mark stories directly affecting Bharosa with 🚨
 
-Design: dark professional email, background #0d0d0d, gold accents #c9a84c, readable on mobile.
-Insight-first means: explain WHY it matters for Bharosa before describing what happened."""
+Return only valid HTML, no markdown."""
 
 def generate_briefing():
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -40,7 +37,7 @@ def generate_briefing():
     
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=4000,
+        max_tokens=2000,
         system=SYSTEM_PROMPT,
         tools=[{"type": "web_search_20250305", "name": "web_search"}],
         messages=[{
