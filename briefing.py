@@ -352,9 +352,12 @@ def generate_briefing():
 
     html_content = ""
     for block in response.content:
-        if block.type == "text" and block.text.strip().startswith("<!DOCTYPE"):
-            html_content = block.text
-            break
+        if block.type == "text":
+            text = block.text.strip()
+            if "<!DOCTYPE" in text:
+                # Extract from <!DOCTYPE onwards
+                html_content = text[text.index("<!DOCTYPE"):]
+                break
 
     html_content = html_content.replace("```html", "").replace("```", "").strip()
     return html_content
@@ -370,7 +373,7 @@ def send_email(html_content):
         "arjit@bharosa.finance",
         "ayush@bharosa.finance",
         "lynelle@bharosa.finance",
-        "abhishekraju.private@gmail.com"
+        "abhishekraju.private@gmail.com",
         "ujjwal@bharosa.finance",
         "sahil@bharosa.finance",
     ]
