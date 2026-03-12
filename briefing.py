@@ -367,6 +367,7 @@ def send_email(html_content):
         "santosh@bharosa.finance",
         "prachi.khushlani@bharosa.finance",
         "arjit@bharosa.finance",
+        "ayush@bharosa.finance",
         "lynelle@bharosa.finance",
         "ujjwal@bharosa.finance",
         "sahil@bharosa.finance",
