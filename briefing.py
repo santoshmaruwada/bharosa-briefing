@@ -352,8 +352,9 @@ def generate_briefing():
 
     html_content = ""
     for block in response.content:
-        if block.type == "text":
-            html_content += block.text
+        if block.type == "text" and block.text.strip().startswith("<!DOCTYPE"):
+            html_content = block.text
+            break
 
     html_content = html_content.replace("```html", "").replace("```", "").strip()
     return html_content
