@@ -21,7 +21,7 @@ India is beachhead. Ambition is global. Financial anxiety is universal.
 
 COMPETITORS TO REFERENCE BY NAME:
 India: INDmoney, Groww, Kuvera, ET Money, Scripbox, Wealth Monitor, mProfit, Perfios
-Global: Monarch Money, Copilot Money, Wealthfront, Betterment, Orion, Addepar
+: Monarch Money, Copilot Money, Wealthfront, Betterment, Orion, Addepar
 AI threat: Generic GPT/Claude wrappers giving financial "advice" without real computation
 
 YOUR JOB: Daily memo that makes Sahil and Santosh think "shit, we need to build this" or "this confirms we're early." Not a newsletter. Not a consulting report. A strategic shot of adrenaline.
@@ -62,6 +62,14 @@ World Signals section:
 - Each = 2 lines max: what happened + why a founder should care
 - Think: things a well-informed founder would want to know at breakfast
 - Not everything needs a Bharosa connection — general awareness matters too
+Events Radar section:
+- Search for upcoming fintech, wealth, AI, and startup events in Mumbai and Bangalore only
+- Only include events happening in the NEXT 30 DAYS from today's date
+- If nothing relevant found, skip this section entirely — do not show it
+- For each event include: name, date, city, one line on why it's relevant to Bharosa
+- Always flag Mumbai events with "→ Santosh, this is in your city."
+- Max 4 events. Prioritise Mumbai first, Bangalore second.
+- Include registration or info link for each event
 
 OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No backticks. No preamble. Stay under 8000 tokens.
 
@@ -243,6 +251,41 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 </td></tr>
 </table>
 
+<!-- EVENTS RADAR -->
+<!-- Only include this section if relevant events were found. If no events, skip entirely. -->
+<p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Events Radar</p>
+<p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Upcoming in Mumbai & Bangalore worth your time.</p>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+<tr><td style="background:#f0fff4;border-radius:10px;padding:16px 18px;border-left:3px solid #30d158;">
+
+  <!-- Repeat this block for each event found, skip entire section if none -->
+  <p style="margin:0 0 12px;font-size:14px;color:#1c1c1e;line-height:1.6;">
+    <strong style="color:#1c1c1e;">[EVENT NAME]</strong>
+    <span style="background:#e8f5e9;color:#30d158;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-left:8px;text-transform:uppercase;">[CITY]</span>
+    <span style="background:#f2f2f7;color:#636366;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:4px;">[DATE]</span><br>
+    <span style="color:#3a3a3c;">[One line — why relevant to Bharosa: IFA network, competitor intel, investor access, etc.]</span><br>
+    <span style="color:#30d158;font-size:13px;font-weight:600;">[IF MUMBAI: → Santosh, this is in your city.]</span>
+    <span style="font-size:12px;color:#8e8e93;margin-left:8px;"><a href="[EVENT_URL]" style="color:#007aff;text-decoration:none;">Details →</a></span>
+  </p>
+
+</td></tr>
+</table>
+```
+
+---
+
+**Change 4 — Add to USER_MESSAGE writing rules**
+
+Find:
+```
+- Name specific competitors in every comparison
+```
+
+Add after it:
+```
+- Events Radar: only show if real upcoming events found — skip the section entirely if nothing relevant in next 30 days
+
 <!-- RAW CONVERSATIONS -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Worth Reading</p>
 <p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Real discussions. Not articles. Build intuition.</p>
@@ -320,6 +363,7 @@ SEARCH — do all of these:
 5. Regulatory: recent SEBI, SEC, tax changes affecting personal finance
 6. AI news today: latest model launches, AI company moves, capability upgrades, AI policy changes, open source releases
 7. World news: major global events, economic shifts, regulatory moves, India developments — things a founder should know
+8. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" + "fintech meetup Bangalore 2026" — find upcoming events in the next 30 days only. Ignore anything already past.
 
 WRITING RULES — follow these exactly:
 - Every signal = 3 lines max: What's happening / Why it matters / What to build
