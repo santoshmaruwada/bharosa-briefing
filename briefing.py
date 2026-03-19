@@ -10,6 +10,7 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 TO_EMAIL = os.environ["TO_EMAIL"]
+RADAR_URL = "https://bharosaradar.netlify.app"
 
 SYSTEM_PROMPT = """You are Bharosa's daily intelligence engine.
 
@@ -406,6 +407,136 @@ def generate_briefing():
     html_content = html_content.replace("```html", "").replace("```", "").strip()
     return html_content
 
+def inject_radar_button(html_content: str, radar_url: str) -> str:
+    """
+    Injects the Competitor Radar section into the daily briefing HTML,
+    just before the closing </body> tag.
+    Works with inline-CSS-only HTML (email client safe).
+    """
+ 
+    radar_block = f"""
+<!-- ── COMPETITOR RADAR SECTION ── -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="margin:32px 0 0;border-top:1px solid #e5e5ea;">
+  <tr>
+    <td style="padding:28px 0 0;">
+ 
+      <!-- Section label -->
+      <p style="margin:0 0 6px;font-size:10px;font-weight:700;
+                letter-spacing:3px;color:#98989d;text-transform:uppercase;">
+        Competitor Radar
+      </p>
+      <p style="margin:0 0 20px;font-size:13px;color:#8e8e93;line-height:1.5;">
+        50 players tracked across India and the world — AI depth, funding momentum,
+        user growth, and threat to Bharosa. Updated with live AI research.
+      </p>
+ 
+      <!-- Stat pills row -->
+      <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
+        <tr>
+          <td style="padding-right:10px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="background:#f2f2f7;border-radius:8px;
+                           padding:10px 16px;text-align:center;">
+                  <p style="margin:0;font-size:18px;font-weight:700;
+                            color:#00c47d;font-family:monospace;">50</p>
+                  <p style="margin:2px 0 0;font-size:9px;font-weight:700;
+                            letter-spacing:0.1em;text-transform:uppercase;
+                            color:#98989d;">Players</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td style="padding-right:10px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="background:#f2f2f7;border-radius:8px;
+                           padding:10px 16px;text-align:center;">
+                  <p style="margin:0;font-size:18px;font-weight:700;
+                            color:#5b8df5;font-family:monospace;">20</p>
+                  <p style="margin:2px 0 0;font-size:9px;font-weight:700;
+                            letter-spacing:0.1em;text-transform:uppercase;
+                            color:#98989d;">India</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td>
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="background:#f2f2f7;border-radius:8px;
+                           padding:10px 16px;text-align:center;">
+                  <p style="margin:0;font-size:18px;font-weight:700;
+                            color:#ff453a;font-family:monospace;">19</p>
+                  <p style="margin:2px 0 0;font-size:9px;font-weight:700;
+                            letter-spacing:0.1em;text-transform:uppercase;
+                            color:#98989d;">High threat</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+ 
+      <!-- Feature bullets -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="background:#f9f9fb;border-radius:10px;
+                    margin-bottom:22px;padding:0;">
+        <tr>
+          <td style="padding:16px 18px;">
+            <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;">
+              <strong style="color:#00c47d;">&#9679;</strong>&nbsp;
+              Live AI research — click Refresh to re-score all 50 players
+            </p>
+            <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;">
+              <strong style="color:#5b8df5;">&#9679;</strong>&nbsp;
+              Radar bars: AI depth, orchestration, India context, trust, sentiment
+            </p>
+            <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;">
+              <strong style="color:#af52de;">&#9679;</strong>&nbsp;
+              Progress tracker: funding deltas, user growth, AI score trends
+            </p>
+            <p style="margin:0;font-size:13px;color:#3a3a3c;line-height:1.6;">
+              <strong style="color:#ff9f0a;">&#9679;</strong>&nbsp;
+              Clickable links to latest news, funding rounds, and user reviews
+            </p>
+          </td>
+        </tr>
+      </table>
+ 
+      <!-- CTA Button -->
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="background:#00c47d;border-radius:10px;">
+            <a href="{radar_url}"
+               style="display:inline-block;padding:14px 32px;
+                      font-size:14px;font-weight:700;color:#ffffff;
+                      text-decoration:none;letter-spacing:0.02em;
+                      font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
+              Open Competitor Radar &nbsp;→
+            </a>
+          </td>
+        </tr>
+      </table>
+ 
+      <!-- Footer note -->
+      <p style="margin:14px 0 0;font-size:11px;color:#aeaeb2;">
+        Opens in browser. Hit <strong>Refresh Radar</strong> inside the dashboard
+        to pull the latest AI research across all 50 players.
+      </p>
+ 
+    </td>
+  </tr>
+</table>
+<!-- ── END COMPETITOR RADAR SECTION ── -->
+"""
+ 
+    # Inject just before </body> — fallback to appending if tag not found
+    if "</body>" in html_content:
+        return html_content.replace("</body>", radar_block + "\n</body>", 1)
+    else:
+        return html_content + radar_block
 
 def send_email(html_content):
     today = datetime.now().strftime("%B %d, %Y")
@@ -422,7 +553,8 @@ def send_email(html_content):
         "sahil@bharosa.finance",
     ]
 
-    msg = MIMEMultipart("alternative")
+    final_html = inject_radar_button(html_content, RADAR_URL)
+    msg.attach(MIMEText(final_html, "html"))
     msg["Subject"] = subject
     msg["From"] = f"Bharosa Intel <{GMAIL_USER}>"
     msg["To"] = ", ".join(recipients)
