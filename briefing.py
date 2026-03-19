@@ -554,14 +554,15 @@ def send_email(html_content):
     ]
 
     final_html = inject_radar_button(html_content, RADAR_URL)
-    msg.attach(MIMEText(final_html, "html"))
+
+    msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"Bharosa Intel <{GMAIL_USER}>"
     msg["To"] = ", ".join(recipients)
 
     plain_text = f"Bharosa Intel — {today}\n\nOpen in an HTML email client to view."
     msg.attach(MIMEText(plain_text, "plain"))
-    msg.attach(MIMEText(html_content, "html"))
+    msg.attach(MIMEText(final_html, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
