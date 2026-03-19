@@ -100,8 +100,23 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <tr><td style="background:#1c1c1e;padding:0 36px 24px;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr><td style="background:rgba(255,159,10,0.12);border-radius:10px;padding:16px 18px;border-left:3px solid #ff9f0a;">
-    <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff9f0a;text-transform:uppercase;">Build This Week</p>
-    <p style="margin:0;font-size:15px;color:#ffffff;line-height:1.5;font-weight:600;">[ONE SENTENCE — the single most important thing to build or prioritise this week. No fluff. Direct.]</p>
+    <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff9f0a;text-transform:uppercase;">Competitor Watch</p>
+    <p style="margin:0 0 4px;font-size:15px;color:#ffffff;line-height:1.5;font-weight:600;">[NAMED COMPETITOR] — [What they just did or announced. One punchy sentence.]</p>
+    <p style="margin:0;font-size:13px;color:#ff9f0a;line-height:1.5;">→ [What this means for Bharosa. What they're still missing. One sentence.]</p>
+```
+
+And update the instruction in SYSTEM_PROMPT rules — find any mention of "Build This Week" and replace with:
+```
+Top Competitor Watch block:
+- Find the single most newsworthy competitor move from the last 48 hours
+- Must be a NAMED competitor from the list — INDmoney, Groww, Monarch Money etc.
+- State what they did + one thing they still can't do that Bharosa can
+- Source must be real — funding news, product launch, user milestone, press coverage
+```
+
+And in USER_MESSAGE, add to the search list:
+```
+0. Competitor news first: Search "[competitor name] launch 2026" + "Groww new feature" + "INDmoney funding" + "Monarch Money update" — find the freshest competitor move from last 48 hours to lead the briefing
   </td></tr>
   </table>
 </td></tr>
