@@ -22,14 +22,14 @@ India is beachhead. Ambition is global. Financial anxiety is universal.
 
 COMPETITORS TO REFERENCE BY NAME:
 India: INDmoney, Groww, Kuvera, ET Money, Scripbox, Wealth Monitor, mProfit, Perfios
-: Monarch Money, Copilot Money, Wealthfront, Betterment, Orion, Addepar
+Global: Monarch Money, Copilot Money, Wealthfront, Betterment, Orion, Addepar
 AI threat: Generic GPT/Claude wrappers giving financial "advice" without real computation
 
 YOUR JOB: Daily memo that makes Sahil and Santosh think "shit, we need to build this" or "this confirms we're early." Not a newsletter. Not a consulting report. A strategic shot of adrenaline.
 
 TONE RULES — THIS IS CRITICAL:
 - Write like a sharp operator, not an analyst
-- Every signal = 3 lines max: What's happening → Why it matters → What Bharosa should do
+- Every signal = 3 lines max: What's happening, Why it matters, What Bharosa should do
 - No big words. No "deterministic reasoning" or "orchestration framework" or "probabilistic modelling"
 - Simple, fast, punchy sentences. Like texting a cofounder, not writing a whitepaper.
 - The whole note must be readable in under 4 minutes
@@ -50,12 +50,18 @@ SEARCH FOR RAW HUMAN CONVERSATIONS:
 
 SECTION-SPECIFIC RULES:
 
+Top Competitor Watch block:
+- Find the single most newsworthy competitor move from the last 48 hours
+- Must be a NAMED competitor from the list — INDmoney, Groww, Monarch Money etc.
+- State what they did + one thing they still can't do that Bharosa can
+- Source must be real — funding news, product launch, user milestone, press coverage
+
 AI Radar section:
 - 3-4 quick-hit AI updates from the last 24-48 hours
 - Can include: model launches, capability upgrades, AI policy moves, major AI company actions, open source releases, research breakthroughs
 - Each update = 2 lines max: what happened + why it's interesting
 - These are FYI signals — founder should know what's moving in AI today
-- If any update has a direct Bharosa implication, flag it with "→ Bharosa angle:" in one sentence
+- If any update has a direct Bharosa implication, flag it with "Bharosa angle:" in one sentence
 
 World Signals section:
 - 3-4 notable global actions, events, or decisions from the last 24-48 hours
@@ -63,31 +69,28 @@ World Signals section:
 - Each = 2 lines max: what happened + why a founder should care
 - Think: things a well-informed founder would want to know at breakfast
 - Not everything needs a Bharosa connection — general awareness matters too
+
 Events Radar section:
 - Search for upcoming fintech, wealth, AI, and startup events in Mumbai and Bangalore only
 - Only include events happening in the NEXT 30 DAYS from today's date
 - If nothing relevant found, skip this section entirely — do not show it
 - For each event include: name, date, city, one line on why it's relevant to Bharosa
-- Always flag Mumbai events with "→ Santosh, this is in your city."
+- Always flag Mumbai events with "Santosh, this is in your city."
 - Max 4 events. Prioritise Mumbai first, Bangalore second.
 - Include registration or info link for each event
 
 OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No backticks. No preamble. Stay under 8000 tokens.
-
----
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bharosa Intel — [DATE]</title>
+<title>Bharosa Intel -- [DATE]</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif;">
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f5f7;">
 <tr><td align="center" style="padding:32px 16px;">
-
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.06);">
 
 <!-- HEADER -->
@@ -96,32 +99,18 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
   <h1 style="margin:0 0 4px;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">[DATE]</h1>
 </td></tr>
 
-<!-- TOP SIGNAL -->
+<!-- COMPETITOR WATCH -->
 <tr><td style="background:#1c1c1e;padding:0 36px 24px;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr><td style="background:rgba(255,159,10,0.12);border-radius:10px;padding:16px 18px;border-left:3px solid #ff9f0a;">
     <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff9f0a;text-transform:uppercase;">Competitor Watch</p>
-    <p style="margin:0 0 4px;font-size:15px;color:#ffffff;line-height:1.5;font-weight:600;">[NAMED COMPETITOR] — [What they just did or announced. One punchy sentence.]</p>
-    <p style="margin:0;font-size:13px;color:#ff9f0a;line-height:1.5;">→ [What this means for Bharosa. What they're still missing. One sentence.]</p>
-```
-
-And update the instruction in SYSTEM_PROMPT rules — find any mention of "Build This Week" and replace with:
-```
-Top Competitor Watch block:
-- Find the single most newsworthy competitor move from the last 48 hours
-- Must be a NAMED competitor from the list — INDmoney, Groww, Monarch Money etc.
-- State what they did + one thing they still can't do that Bharosa can
-- Source must be real — funding news, product launch, user milestone, press coverage
-```
-
-And in USER_MESSAGE, add to the search list:
-```
-0. Competitor news first: Search "[competitor name] launch 2026" + "Groww new feature" + "INDmoney funding" + "Monarch Money update" — find the freshest competitor move from last 48 hours to lead the briefing
+    <p style="margin:0 0 4px;font-size:15px;color:#ffffff;line-height:1.5;font-weight:600;">[NAMED COMPETITOR] -- [What they just did or announced. One punchy sentence.]</p>
+    <p style="margin:0;font-size:13px;color:#ff9f0a;line-height:1.5;">-- [What this means for Bharosa. What they're still missing. One sentence.]</p>
   </td></tr>
   </table>
 </td></tr>
 
-<!-- NON-CONSENSUS -->
+<!-- CONTRARIAN BET -->
 <tr><td style="background:#fff8f0;padding:14px 36px;border-bottom:1px solid #f2f2f7;">
   <p style="margin:0 0 2px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff6b00;text-transform:uppercase;">Contrarian Bet</p>
   <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.5;font-weight:600;">[ONE SHARP SENTENCE challenging what most fintech founders or users believe about personal finance + AI. Must connect to why Bharosa's approach wins.]</p>
@@ -135,66 +124,66 @@ And in USER_MESSAGE, add to the search list:
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #007aff;">
-  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE — specific user anxiety or behaviour. Short.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What's happening — one sentence paraphrasing real online discussion.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters — one sentence connecting to Bharosa's vision.]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">→ Build: [What Bharosa should build. One sentence.]</p>
-  <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [Why they can't do this — one sentence.] · <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source →</a></p>
+  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- specific user anxiety or behaviour. Short.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What's happening -- one sentence paraphrasing real online discussion.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters -- one sentence connecting to Bharosa's vision.]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Build: [What Bharosa should build. One sentence.]</p>
+  <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [Why they can't do this -- one sentence.] <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #ff453a;">
-  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE — trust barrier or resistance to AI financial tools]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What users are saying — real sentiment, one sentence.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters — what this means for how Bharosa should present itself.]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">→ Build: [Specific UX or positioning action.]</p>
-  <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [One sentence.] · <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source →</a></p>
+  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- trust barrier or resistance to AI financial tools]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What users are saying -- real sentiment, one sentence.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters -- what this means for how Bharosa should present itself.]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Build: [Specific UX or positioning action.]</p>
+  <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [One sentence.] <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
 
-<!-- AI CAPABILITY (Bharosa-specific) -->
+<!-- AI CAPABILITY -->
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">AI Capability for Bharosa</p>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #af52de;">
-  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE — AI development that changes what Bharosa can build]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What changed — one sentence. Plain language.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters for Bharosa specifically — strengthens the engine, unlocks a feature, etc.]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">→ Do: [Specific action this week.]</p>
-  <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source →</a></p>
+  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- AI development that changes what Bharosa can build]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What changed -- one sentence. Plain language.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters for Bharosa specifically.]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Do: [Specific action this week.]</p>
+  <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
 
 <!-- COMPETITOR + MARKET -->
-<p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Competitor & Market</p>
+<p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Competitor and Market</p>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
-  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[NAMED COMPETITOR] → [What they did, 5-8 words]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Where they stop — the life question they still can't answer. One sentence.]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#007aff;line-height:1.6;font-weight:600;">Bharosa edge: [One sentence — architectural reason.]</p>
-  <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source →</a></p>
+  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[NAMED COMPETITOR] -- [What they did, 5-8 words]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Where they stop -- the life question they still can't answer. One sentence.]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#007aff;line-height:1.6;font-weight:600;">Bharosa edge: [One sentence -- architectural reason.]</p>
+  <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
-  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[REGULATORY/MARKET SHIFT — short headline]</p>
+  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[REGULATORY/MARKET SHIFT -- short headline]</p>
   <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What changed and why it matters. One sentence.]</p>
-  <p style="margin:0;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">→ Opportunity: [One sentence.]</p>
-  <p style="margin:6px 0 0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source →</a></p>
+  <p style="margin:0;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Opportunity: [One sentence.]</p>
+  <p style="margin:6px 0 0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
 
-<!-- PRODUCT DIRECTION -->
+<!-- WHAT TO BUILD -->
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">What to Build</p>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0faf4;border-radius:10px;padding:16px 18px;border-left:3px solid #30d158;">
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;font-style:italic;">[ONE sentence synthesising today's signals into a product gap.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">1. [FEATURE NAME] — [What it does, who it's for, one sentence.]</p>
-  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">2. [FEATURE NAME] — [Buildable in 2-4 weeks. Addresses a signal from today.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">1. [FEATURE NAME] -- [What it does, who it's for, one sentence.]</p>
+  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">2. [FEATURE NAME] -- [Buildable in 2-4 weeks. Addresses a signal from today.]</p>
 </td></tr>
 </table>
 
@@ -204,32 +193,26 @@ And in USER_MESSAGE, add to the search list:
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f5f0ff;border-radius:10px;padding:16px 18px;">
-
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 1 HEADLINE — 5-8 words]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence — what happened and why it's interesting.]</span>
-    [IF BHAROSA-RELEVANT: <span style="color:#af52de;font-weight:600;">→ Bharosa angle: [one sentence]</span>]
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 1]</strong><br>
+    <span style="color:#3a3a3c;">[One sentence.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 2 HEADLINE]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span>
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 2]</strong><br>
+    <span style="color:#3a3a3c;">[One sentence.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 3 HEADLINE]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span>
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 3]</strong><br>
+    <span style="color:#3a3a3c;">[One sentence.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
   <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 4 HEADLINE]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span>
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 4]</strong><br>
+    <span style="color:#3a3a3c;">[One sentence.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
 </td></tr>
 </table>
 
@@ -239,112 +222,82 @@ And in USER_MESSAGE, add to the search list:
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0f7ff;border-radius:10px;padding:16px 18px;">
-
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 1 — headline, 5-10 words]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence — what happened and why a founder should care.]</span>
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 1]</strong><br>
+    <span style="color:#3a3a3c;">[One sentence -- what happened and why a founder should care.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
     <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 2]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span>
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <span style="color:#3a3a3c;">[One sentence.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
     <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 3]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span>
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <span style="color:#3a3a3c;">[One sentence.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
   <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;">
     <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 4]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span>
-    <br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source →</a></span>
+    <span style="color:#3a3a3c;">[One sentence.]</span><br>
+    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
   </p>
-
 </td></tr>
 </table>
 
-<!-- EVENTS RADAR -->
-<!-- Only include this section if relevant events were found. If no events, skip entirely. -->
+<!-- EVENTS RADAR -- skip this entire section if no events found -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Events Radar</p>
-<p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Upcoming in Mumbai & Bangalore worth your time.</p>
+<p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Upcoming in Mumbai and Bangalore worth your time.</p>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0fff4;border-radius:10px;padding:16px 18px;border-left:3px solid #30d158;">
-
-  <!-- Repeat this block for each event found, skip entire section if none -->
   <p style="margin:0 0 12px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#1c1c1e;">[EVENT NAME]</strong>
+    <strong>[EVENT NAME]</strong>
     <span style="background:#e8f5e9;color:#30d158;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-left:8px;text-transform:uppercase;">[CITY]</span>
     <span style="background:#f2f2f7;color:#636366;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:4px;">[DATE]</span><br>
-    <span style="color:#3a3a3c;">[One line — why relevant to Bharosa: IFA network, competitor intel, investor access, etc.]</span><br>
-    <span style="color:#30d158;font-size:13px;font-weight:600;">[IF MUMBAI: → Santosh, this is in your city.]</span>
-    <span style="font-size:12px;color:#8e8e93;margin-left:8px;"><a href="[EVENT_URL]" style="color:#007aff;text-decoration:none;">Details →</a></span>
+    <span style="color:#3a3a3c;">[One line -- why relevant to Bharosa.]</span><br>
+    <span style="color:#30d158;font-size:13px;font-weight:600;">[IF MUMBAI: Santosh, this is in your city.]</span>
+    <span style="font-size:12px;color:#8e8e93;margin-left:8px;"><a href="[EVENT_URL]" style="color:#007aff;text-decoration:none;">Details</a></span>
   </p>
-
 </td></tr>
 </table>
-```
 
----
-
-**Change 4 — Add to USER_MESSAGE writing rules**
-
-Find:
-```
-- Name specific competitors in every comparison
-```
-
-Add after it:
-```
-- Events Radar: only show if real upcoming events found — skip the section entirely if nothing relevant in next 30 days
-
-<!-- RAW CONVERSATIONS -->
+<!-- WORTH READING -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Worth Reading</p>
 <p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Real discussions. Not articles. Build intuition.</p>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
-
   <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
     <span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span>
     <a href="[REDDIT_URL_1]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
-    <span style="font-size:12px;color:#8e8e93;">[Why read — one line]</span>
+    <span style="font-size:12px;color:#8e8e93;">[Why read -- one line]</span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
     <span style="background:#000000;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">X</span>
     <a href="[TWITTER_URL_1]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
     <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
     <span style="background:#ff6600;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">HN</span>
     <a href="[HN_URL]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
     <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
     <span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span>
     <a href="[REDDIT_URL_2]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
     <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
   </p>
-
   <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
     <span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span>
     <a href="[REDDIT_URL_3]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
     <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
   </p>
-
   <p style="margin:0;font-size:14px;line-height:1.6;">
     <span style="background:#000000;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">X</span>
     <a href="[TWITTER_URL_2]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
     <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
   </p>
-
 </td></tr>
 </table>
 
@@ -359,29 +312,29 @@ Add after it:
 
 <!-- FOOTER -->
 <tr><td style="padding:20px 36px;text-align:center;border-top:1px solid #f2f2f7;">
-  <p style="margin:0;font-size:11px;color:#aeaeb2;">Bharosa Intel · [DATE]</p>
+  <p style="margin:0;font-size:11px;color:#aeaeb2;">Bharosa Intel -- [DATE]</p>
 </td></tr>
 
 </table>
 </td></tr>
 </table>
-
 </body>
 </html>"""
 
 USER_MESSAGE = """Generate today's Bharosa intelligence memo. Today is {date}.
 
-SEARCH — do all of these:
-1. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" — r/personalfinance, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/tax
-2. Twitter/X: "AI financial advisor" + "personal finance AI" — find real debates
+SEARCH -- do all of these in order:
+0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" + "Copilot Money 2026" -- find the freshest competitor move from last 48 hours to lead the briefing
+1. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" -- r/personalfinance, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/tax
+2. Twitter/X: "AI financial advisor" + "personal finance AI" -- find real debates
 3. Hacker News: "site:news.ycombinator.com personal finance AI" or "financial agent"
 4. Competitors: recent moves by INDmoney, Groww, Monarch Money, Copilot Money, Wealthfront
 5. Regulatory: recent SEBI, SEC, tax changes affecting personal finance
 6. AI news today: latest model launches, AI company moves, capability upgrades, AI policy changes, open source releases
-7. World news: major global events, economic shifts, regulatory moves, India developments — things a founder should know
-8. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" + "fintech meetup Bangalore 2026" — find upcoming events in the next 30 days only. Ignore anything already past.
+7. World news: major global events, economic shifts, regulatory moves, India developments -- things a founder should know
+8. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" + "fintech meetup Bangalore 2026" -- find upcoming events in the next 30 days only. Ignore anything already past.
 
-WRITING RULES — follow these exactly:
+WRITING RULES -- follow these exactly:
 - Every signal = 3 lines max: What's happening / Why it matters / What to build
 - AI Radar items = 2 lines max: What happened / Why it's interesting
 - World Signal items = 2 lines max: What happened / Why a founder should care
@@ -391,6 +344,7 @@ WRITING RULES — follow these exactly:
 - Whole note readable in under 4 minutes
 - All 6 conversation links must be DISCUSSION THREADS, not articles
 - Name specific competitors in every comparison
+- Events Radar: only show if real upcoming events found in next 30 days -- skip section entirely if nothing relevant
 
 Return only the complete HTML. No markdown. No backticks."""
 
@@ -415,147 +369,82 @@ def generate_briefing():
         if block.type == "text":
             text = block.text.strip()
             if "<!DOCTYPE" in text:
-                # Extract from <!DOCTYPE onwards
                 html_content = text[text.index("<!DOCTYPE"):]
                 break
 
     html_content = html_content.replace("```html", "").replace("```", "").strip()
+
+    # Safety check -- close HTML if truncated mid-generation
+    if html_content and not html_content.strip().endswith("</html>"):
+        html_content += "\n</body></html>"
+
     return html_content
 
+
 def inject_radar_button(html_content: str, radar_url: str) -> str:
-    """
-    Injects the Competitor Radar section into the daily briefing HTML,
-    just before the closing </body> tag.
-    Works with inline-CSS-only HTML (email client safe).
-    """
- 
     radar_block = f"""
-<!-- ── COMPETITOR RADAR SECTION ── -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0"
-       style="margin:32px 0 0;border-top:1px solid #e5e5ea;">
+<!-- COMPETITOR RADAR SECTION -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0 0;border-top:1px solid #e5e5ea;">
   <tr>
-    <td style="padding:28px 0 0;">
- 
-      <!-- Section label -->
-      <p style="margin:0 0 6px;font-size:10px;font-weight:700;
-                letter-spacing:3px;color:#98989d;text-transform:uppercase;">
-        Competitor Radar
-      </p>
-      <p style="margin:0 0 20px;font-size:13px;color:#8e8e93;line-height:1.5;">
-        50 players tracked across India and the world — AI depth, funding momentum,
-        user growth, and threat to Bharosa. Updated with live AI research.
-      </p>
- 
-      <!-- Stat pills row -->
+    <td style="padding:28px 36px 0;">
+      <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Competitor Radar</p>
+      <p style="margin:0 0 20px;font-size:13px;color:#8e8e93;line-height:1.5;">50 players tracked across India and the world -- AI depth, funding momentum, user growth, and threat to Bharosa. Updated with live AI research.</p>
       <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
         <tr>
           <td style="padding-right:10px;">
             <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="background:#f2f2f7;border-radius:8px;
-                           padding:10px 16px;text-align:center;">
-                  <p style="margin:0;font-size:18px;font-weight:700;
-                            color:#00c47d;font-family:monospace;">50</p>
-                  <p style="margin:2px 0 0;font-size:9px;font-weight:700;
-                            letter-spacing:0.1em;text-transform:uppercase;
-                            color:#98989d;">Players</p>
-                </td>
-              </tr>
+              <tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;">
+                <p style="margin:0;font-size:18px;font-weight:700;color:#00c47d;font-family:monospace;">50</p>
+                <p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">Players</p>
+              </td></tr>
             </table>
           </td>
           <td style="padding-right:10px;">
             <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="background:#f2f2f7;border-radius:8px;
-                           padding:10px 16px;text-align:center;">
-                  <p style="margin:0;font-size:18px;font-weight:700;
-                            color:#5b8df5;font-family:monospace;">20</p>
-                  <p style="margin:2px 0 0;font-size:9px;font-weight:700;
-                            letter-spacing:0.1em;text-transform:uppercase;
-                            color:#98989d;">India</p>
-                </td>
-              </tr>
+              <tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;">
+                <p style="margin:0;font-size:18px;font-weight:700;color:#5b8df5;font-family:monospace;">20</p>
+                <p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">India</p>
+              </td></tr>
             </table>
           </td>
           <td>
             <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="background:#f2f2f7;border-radius:8px;
-                           padding:10px 16px;text-align:center;">
-                  <p style="margin:0;font-size:18px;font-weight:700;
-                            color:#ff453a;font-family:monospace;">19</p>
-                  <p style="margin:2px 0 0;font-size:9px;font-weight:700;
-                            letter-spacing:0.1em;text-transform:uppercase;
-                            color:#98989d;">High threat</p>
-                </td>
-              </tr>
+              <tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;">
+                <p style="margin:0;font-size:18px;font-weight:700;color:#ff453a;font-family:monospace;">19</p>
+                <p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">High threat</p>
+              </td></tr>
             </table>
           </td>
         </tr>
       </table>
- 
-      <!-- Feature bullets -->
-      <table width="100%" cellpadding="0" cellspacing="0" border="0"
-             style="background:#f9f9fb;border-radius:10px;
-                    margin-bottom:22px;padding:0;">
-        <tr>
-          <td style="padding:16px 18px;">
-            <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;">
-              <strong style="color:#00c47d;">&#9679;</strong>&nbsp;
-              Live AI research — click Refresh to re-score all 50 players
-            </p>
-            <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;">
-              <strong style="color:#5b8df5;">&#9679;</strong>&nbsp;
-              Radar bars: AI depth, orchestration, India context, trust, sentiment
-            </p>
-            <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;">
-              <strong style="color:#af52de;">&#9679;</strong>&nbsp;
-              Progress tracker: funding deltas, user growth, AI score trends
-            </p>
-            <p style="margin:0;font-size:13px;color:#3a3a3c;line-height:1.6;">
-              <strong style="color:#ff9f0a;">&#9679;</strong>&nbsp;
-              Clickable links to latest news, funding rounds, and user reviews
-            </p>
-          </td>
-        </tr>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f9fb;border-radius:10px;margin-bottom:22px;">
+        <tr><td style="padding:16px 18px;">
+          <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#00c47d;">&#9679;</strong>&nbsp; Live AI research -- click Refresh to re-score all 50 players</p>
+          <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#5b8df5;">&#9679;</strong>&nbsp; Radar bars: AI depth, orchestration, India context, trust, sentiment</p>
+          <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#af52de;">&#9679;</strong>&nbsp; Progress tracker: funding deltas, user growth, AI score trends</p>
+          <p style="margin:0;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#ff9f0a;">&#9679;</strong>&nbsp; Clickable links to latest news, funding rounds, and user reviews</p>
+        </td></tr>
       </table>
- 
-      <!-- CTA Button -->
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="background:#00c47d;border-radius:10px;">
-            <a href="{radar_url}"
-               style="display:inline-block;padding:14px 32px;
-                      font-size:14px;font-weight:700;color:#ffffff;
-                      text-decoration:none;letter-spacing:0.02em;
-                      font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
-              Open Competitor Radar &nbsp;→
-            </a>
-          </td>
-        </tr>
+        <tr><td style="background:#00c47d;border-radius:10px;">
+          <a href="{radar_url}" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.02em;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">Open Competitor Radar &nbsp;&#8594;</a>
+        </td></tr>
       </table>
- 
-      <!-- Footer note -->
-      <p style="margin:14px 0 0;font-size:11px;color:#aeaeb2;">
-        Opens in browser. Hit <strong>Refresh Radar</strong> inside the dashboard
-        to pull the latest AI research across all 50 players.
-      </p>
- 
+      <p style="margin:14px 0 0;font-size:11px;color:#aeaeb2;">Opens in browser. Hit <strong>Refresh Radar</strong> inside the dashboard to pull the latest AI research across all 50 players.</p>
     </td>
   </tr>
 </table>
-<!-- ── END COMPETITOR RADAR SECTION ── -->
+<!-- END COMPETITOR RADAR SECTION -->
 """
- 
-    # Inject just before </body> — fallback to appending if tag not found
     if "</body>" in html_content:
         return html_content.replace("</body>", radar_block + "\n</body>", 1)
     else:
         return html_content + radar_block
 
+
 def send_email(html_content):
     today = datetime.now().strftime("%B %d, %Y")
-    subject = f"Bharosa Intel — {today}"
+    subject = f"Bharosa Intel -- {today}"
 
     recipients = [
         "santosh@bharosa.finance",
@@ -575,7 +464,7 @@ def send_email(html_content):
     msg["From"] = f"Bharosa Intel <{GMAIL_USER}>"
     msg["To"] = ", ".join(recipients)
 
-    plain_text = f"Bharosa Intel — {today}\n\nOpen in an HTML email client to view."
+    plain_text = f"Bharosa Intel -- {today}\n\nOpen in an HTML email client to view."
     msg.attach(MIMEText(plain_text, "plain"))
     msg.attach(MIMEText(final_html, "html"))
 
