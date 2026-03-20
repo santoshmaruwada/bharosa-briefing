@@ -1,9 +1,11 @@
 import anthropic
 import smtplib
 import os
+import json
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+from pathlib import Path
 
 # --- CONFIG ---
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
@@ -11,6 +13,84 @@ GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 TO_EMAIL = os.environ["TO_EMAIL"]
 RADAR_URL = "https://bharosaradar.netlify.app"
+COVERAGE_LOG = "coverage_log.json"
+
+# --- COVERAGE MEMORY ---
+
+def load_coverage_log():
+    """Load this week's coverage log. Returns list of covered topic strings."""
+    if not Path(COVERAGE_LOG).exists():
+        return []
+    try:
+        with open(COVERAGE_LOG, "r") as f:
+            data = json.load(f)
+        # Reset if it's Monday or log is from a previous week
+        today = datetime.now()
+        log_date = datetime.fromisoformat(data.get("week_start", "2000-01-01"))
+        days_since = (today - log_date).days
+        if today.weekday() == 0 or days_since >= 7:
+            return []  # Fresh week
+        return data.get("topics", [])
+    except Exception:
+        return []
+
+def save_coverage_log(new_topics: list):
+    """Append today's topics to the coverage log."""
+    existing = []
+    week_start = datetime.now().isoformat()
+    if Path(COVERAGE_LOG).exists():
+        try:
+            with open(COVERAGE_LOG, "r") as f:
+                data = json.load(f)
+            # Keep existing log if same week
+            today = datetime.now()
+            log_date = datetime.fromisoformat(data.get("week_start", "2000-01-01"))
+            days_since = (today - log_date).days
+            if today.weekday() != 0 and days_since < 7:
+                existing = data.get("topics", [])
+                week_start = data.get("week_start", week_start)
+        except Exception:
+            pass
+    combined = list(dict.fromkeys(existing + new_topics))  # Dedupe, preserve order
+    with open(COVERAGE_LOG, "w") as f:
+        json.dump({"week_start": week_start, "topics": combined}, f, indent=2)
+
+def extract_topics_from_html(html: str) -> list:
+    """Extract headline topics from generated HTML for the coverage log."""
+    import re
+    # Pull text from <h3>, <strong>, and <p font-weight:700> tags as topic markers
+    patterns = [
+        r'<h3[^>]*>(.*?)</h3>',
+        r'font-weight:700[^>]*>(.*?)</p>',
+    ]
+    topics = []
+    for pattern in patterns:
+        matches = re.findall(pattern, html, re.DOTALL)
+        for m in matches:
+            clean = re.sub(r'<[^>]+>', '', m).strip()
+            if len(clean) > 20 and len(clean) < 200:
+                topics.append(clean[:150])
+    return topics[:20]  # Cap at 20 topics per day
+
+def format_coverage_context(topics: list) -> str:
+    """Format covered topics into a prompt string for Opus."""
+    if not topics:
+        return ""
+    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    today_name = day_names[datetime.now().weekday()]
+    lines = "\n".join(f"- {t}" for t in topics)
+    return f"""
+ALREADY COVERED THIS WEEK — DO NOT REPEAT:
+The following topics/stories were already sent to the Bharosa team earlier this week. 
+Do NOT cover these again unless there is a genuinely significant new development (new data, major update, reversal, or follow-up that changes the picture).
+If you must reference them, label it clearly as "Update:" and explain what is new.
+
+{lines}
+
+Today is {today_name}. Find fresh signals the team has not seen yet this week.
+"""
+
+# --- PROMPTS ---
 
 SYSTEM_PROMPT = """You are Bharosa's daily intelligence engine.
 
@@ -42,6 +122,12 @@ SIGNAL QUALITY:
 - Competitor mentions must name a specific company and state WHY they can't do what Bharosa does (architectural reason, one sentence)
 - The AI Radar and World Signals sections are broader — they don't need to be Bharosa-specific. They exist to keep founders informed and pattern-matching across domains.
 
+REPETITION RULES — CRITICAL:
+- If a topic appears in the "ALREADY COVERED THIS WEEK" list, skip it entirely unless there is a major new development
+- A "major new development" means: new data released, significant product update, regulatory decision, or story reversal — not just more commentary on the same event
+- If you must reference a covered topic, start with "Update:" and state only what is NEW
+- The goal is that reading Monday, Wednesday, and Friday feels like three distinct, fresh briefings — not the same story told three ways
+
 SEARCH FOR RAW HUMAN CONVERSATIONS:
 - Reddit globally: r/personalfinance, r/financialindependence, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/FIREIndia, r/tax
 - Twitter/X: fintech founders, advisors, AI researchers debating money tools
@@ -60,21 +146,17 @@ AI Radar section:
 - 3-4 quick-hit AI updates from the last 24-48 hours
 - Can include: model launches, capability upgrades, AI policy moves, major AI company actions, open source releases, research breakthroughs
 - Each update = 2 lines max: what happened + why it's interesting
-- These are FYI signals — founder should know what's moving in AI today
 - If any update has a direct Bharosa implication, flag it with "Bharosa angle:" in one sentence
 
 World Signals section:
 - 3-4 notable global actions, events, or decisions from the last 24-48 hours
-- Can include: regulatory moves, economic shifts, geopolitical events, major company decisions, cultural shifts, India-specific developments
 - Each = 2 lines max: what happened + why a founder should care
-- Think: things a well-informed founder would want to know at breakfast
 - Not everything needs a Bharosa connection — general awareness matters too
 
 Events Radar section:
 - Search for upcoming fintech, wealth, AI, and startup events in Mumbai and Bangalore only
 - Only include events happening in the NEXT 30 DAYS from today's date
 - If nothing relevant found, skip this section entirely — do not show it
-- For each event include: name, date, city, one line on why it's relevant to Bharosa
 - Always flag Mumbai events with "Santosh, this is in your city."
 - Max 4 events. Prioritise Mumbai first, Bangalore second.
 - Include registration or info link for each event
@@ -105,7 +187,7 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
   <tr><td style="background:rgba(255,159,10,0.12);border-radius:10px;padding:16px 18px;border-left:3px solid #ff9f0a;">
     <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff9f0a;text-transform:uppercase;">Competitor Watch</p>
     <p style="margin:0 0 4px;font-size:15px;color:#ffffff;line-height:1.5;font-weight:600;">[NAMED COMPETITOR] -- [What they just did or announced. One punchy sentence.]</p>
-    <p style="margin:0;font-size:13px;color:#ff9f0a;line-height:1.5;">-- [What this means for Bharosa. What they're still missing. One sentence.]</p>
+    <p style="margin:0;font-size:13px;color:#ff9f0a;line-height:1.5;">-- [What this means for Bharosa. What they are still missing. One sentence.]</p>
   </td></tr>
   </table>
 </td></tr>
@@ -113,11 +195,14 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <!-- CONTRARIAN BET -->
 <tr><td style="background:#fff8f0;padding:14px 36px;border-bottom:1px solid #f2f2f7;">
   <p style="margin:0 0 2px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff6b00;text-transform:uppercase;">Contrarian Bet</p>
-  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.5;font-weight:600;">[ONE SHARP SENTENCE challenging what most fintech founders or users believe about personal finance + AI. Must connect to why Bharosa's approach wins.]</p>
+  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.5;font-weight:600;">[ONE SHARP SENTENCE challenging what most fintech founders or users believe about personal finance and AI. Must connect to why Bharosa's approach wins.]</p>
 </td></tr>
 
 <!-- BODY -->
 <tr><td style="padding:24px 36px 32px;">
+
+<!-- MONDAY ONLY: LAST WEEK RECAP — include this section only on Mondays -->
+<!-- Skip entirely on Wednesday and Friday -->
 
 <!-- USER SIGNALS -->
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">User Signals</p>
@@ -125,7 +210,7 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #007aff;">
   <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- specific user anxiety or behaviour. Short.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What's happening -- one sentence paraphrasing real online discussion.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What is happening -- one sentence paraphrasing real online discussion.]</p>
   <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters -- one sentence connecting to Bharosa's vision.]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Build: [What Bharosa should build. One sentence.]</p>
   <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [Why they can't do this -- one sentence.] <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
@@ -161,7 +246,7 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
   <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[NAMED COMPETITOR] -- [What they did, 5-8 words]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Where they stop -- the life question they still can't answer. One sentence.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Where they stop -- the life question they still cannot answer. One sentence.]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#007aff;line-height:1.6;font-weight:600;">Bharosa edge: [One sentence -- architectural reason.]</p>
   <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
@@ -245,7 +330,7 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 </td></tr>
 </table>
 
-<!-- EVENTS RADAR -- skip this entire section if no events found -->
+<!-- EVENTS RADAR -- skip entirely if no events found in next 30 days -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Events Radar</p>
 <p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Upcoming in Mumbai and Bangalore worth your time.</p>
 
@@ -323,52 +408,54 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 
 USER_MESSAGE = """Generate today's Bharosa intelligence memo. Today is {date}.
 
+{coverage_context}
+
 SEARCH -- do all of these in order:
-0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" + "Copilot Money 2026" -- find the freshest competitor move from last 48 hours to lead the briefing
+0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" + "Copilot Money 2026" -- find the freshest competitor move from last 48 hours
 1. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" -- r/personalfinance, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/tax
 2. Twitter/X: "AI financial advisor" + "personal finance AI" -- find real debates
 3. Hacker News: "site:news.ycombinator.com personal finance AI" or "financial agent"
 4. Competitors: recent moves by INDmoney, Groww, Monarch Money, Copilot Money, Wealthfront
 5. Regulatory: recent SEBI, SEC, tax changes affecting personal finance
-6. AI news today: latest model launches, AI company moves, capability upgrades, AI policy changes, open source releases
-7. World news: major global events, economic shifts, regulatory moves, India developments -- things a founder should know
-8. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" + "fintech meetup Bangalore 2026" -- find upcoming events in the next 30 days only. Ignore anything already past.
+6. AI news today: latest model launches, AI company moves, capability upgrades, AI policy changes
+7. World news: major global events, economic shifts, regulatory moves, India developments
+8. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" -- find upcoming events in the next 30 days only. Ignore anything already past.
 
-WRITING RULES -- follow these exactly:
+WRITING RULES:
 - Every signal = 3 lines max: What's happening / Why it matters / What to build
-- AI Radar items = 2 lines max: What happened / Why it's interesting
-- World Signal items = 2 lines max: What happened / Why a founder should care
-- No consulting language. No "deterministic" or "orchestration" or "probabilistic"
-- Write like you're texting a cofounder at 9am
+- AI Radar and World Signal items = 2 lines max
+- No consulting language. Write like you're texting a cofounder at 9am
 - Signal first, context after. Never bury the insight.
-- Whole note readable in under 4 minutes
 - All 6 conversation links must be DISCUSSION THREADS, not articles
 - Name specific competitors in every comparison
-- Events Radar: only show if real upcoming events found in next 30 days -- skip section entirely if nothing relevant
+- Events Radar: only show if real upcoming events found -- skip section entirely if nothing relevant
+- If a topic is in the ALREADY COVERED list above, skip it unless there is a major new development. If so, label it "Update:" and state only what is new.
 
 Return only the complete HTML. No markdown. No backticks."""
 
 USER_MESSAGE_MONDAY = """Generate today's Bharosa intelligence memo. Today is {date} — Monday edition.
 
+{coverage_context}
+
 SEARCH -- do all of these in order:
-0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" + "Copilot Money 2026" -- find the freshest competitor move from last 48 hours
-1. WEEK IN REVIEW: Search for the biggest fintech, AI, and India startup news from the past 7 days -- summarise into 4-5 sharp bullets. What moved last week that a founder should have seen?
-2. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" -- r/personalfinance, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/tax
+0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" -- find the freshest competitor move from last 48 hours
+1. WEEK IN REVIEW: Search for the biggest fintech, AI, and India startup stories from the past 7 days -- find 5 sharp developments worth recapping
+2. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" -- r/personalfinance, r/fatFIRE, r/IndiaInvestments, r/tax
 3. Twitter/X: "AI financial advisor" + "personal finance AI" -- find real debates
 4. Hacker News: "site:news.ycombinator.com personal finance AI" or "financial agent"
 5. Competitors: recent moves by INDmoney, Groww, Monarch Money, Copilot Money, Wealthfront
 6. Regulatory: recent SEBI, SEC, tax changes affecting personal finance
-7. AI news today: latest model launches, AI company moves, capability upgrades, AI policy changes
+7. AI news today: latest model launches, AI company moves, capability upgrades
 8. World news: major global events, economic shifts, regulatory moves, India developments
 9. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" -- find upcoming events in the next 30 days only.
 
-MONDAY SPECIAL — include a "Last Week" section at the top of the body (right after Contrarian Bet, before User Signals) using this HTML block:
+MONDAY SPECIAL -- include a "Last Week" section right after the Contrarian Bet strip and before User Signals. Use this exact HTML:
 
-<p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Last Week</p>
+<p style="margin:24px 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Last Week</p>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #ff9f0a;">
-  <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#ff9f0a;text-transform:uppercase;letter-spacing:1px;">Week in Review</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [BIGGEST STORY OF LAST WEEK — one punchy sentence]</p>
+  <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#ff9f0a;text-transform:uppercase;letter-spacing:1px;">Week in Review</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [BIGGEST STORY OF LAST WEEK -- one punchy sentence with source link]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [SECOND KEY DEVELOPMENT]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [THIRD KEY DEVELOPMENT]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [FOURTH KEY DEVELOPMENT]</p>
@@ -376,53 +463,20 @@ MONDAY SPECIAL — include a "Last Week" section at the top of the body (right a
 </td></tr>
 </table>
 
-WRITING RULES -- follow these exactly:
+WRITING RULES:
 - Every signal = 3 lines max: What's happening / Why it matters / What to build
-- AI Radar items = 2 lines max: What happened / Why it's interesting
-- World Signal items = 2 lines max: What happened / Why a founder should care
-- No consulting language. No "deterministic" or "orchestration" or "probabilistic"
-- Write like you're texting a cofounder at 9am
+- AI Radar and World Signal items = 2 lines max
+- No consulting language. Write like you're texting a cofounder at 9am
 - Signal first, context after. Never bury the insight.
 - Whole note readable in under 5 minutes on Mondays
 - All 6 conversation links must be DISCUSSION THREADS, not articles
 - Name specific competitors in every comparison
-- Events Radar: only show if real upcoming events found in next 30 days -- skip section entirely if nothing relevant
+- Events Radar: only show if real upcoming events found -- skip section entirely if nothing relevant
 
 Return only the complete HTML. No markdown. No backticks."""
 
-def generate_briefing():
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    today = datetime.now().strftime("%B %d, %Y")
-    is_monday = datetime.now().weekday() == 0
 
-    user_msg = USER_MESSAGE_MONDAY if is_monday else USER_MESSAGE
-    
-    response = client.messages.create(
-        model="claude-opus-4-6",
-        max_tokens=8000,
-        system=SYSTEM_PROMPT,
-        tools=[{"type": "web_search_20250305", "name": "web_search"}],
-        messages=[{
-            "role": "user",
-            "content": user_msg.format(date=today)
-        }]
-    )
-
-    html_content = ""
-    for block in response.content:
-        if block.type == "text":
-            text = block.text.strip()
-            if "<!DOCTYPE" in text:
-                html_content = text[text.index("<!DOCTYPE"):]
-                break
-
-    html_content = html_content.replace("```html", "").replace("```", "").strip()
-
-    if html_content and not html_content.strip().endswith("</html>"):
-        html_content += "\n</body></html>"
-
-    return html_content
-
+# --- RADAR INJECTION ---
 
 def inject_radar_button(html_content: str, radar_url: str) -> str:
     radar_block = f"""
@@ -485,9 +539,60 @@ def inject_radar_button(html_content: str, radar_url: str) -> str:
         return html_content + radar_block
 
 
+# --- GENERATE ---
+
+def generate_briefing():
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    today = datetime.now().strftime("%B %d, %Y")
+    is_monday = datetime.now().weekday() == 0
+
+    # Load what was already covered this week
+    covered_topics = load_coverage_log()
+    coverage_context = format_coverage_context(covered_topics)
+
+    # Pick Monday or regular message
+    template = USER_MESSAGE_MONDAY if is_monday else USER_MESSAGE
+
+    response = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=8000,
+        system=SYSTEM_PROMPT,
+        tools=[{"type": "web_search_20250305", "name": "web_search"}],
+        messages=[{
+            "role": "user",
+            "content": template.format(date=today, coverage_context=coverage_context)
+        }]
+    )
+
+    html_content = ""
+    for block in response.content:
+        if block.type == "text":
+            text = block.text.strip()
+            if "<!DOCTYPE" in text:
+                html_content = text[text.index("<!DOCTYPE"):]
+                break
+
+    html_content = html_content.replace("```html", "").replace("```", "").strip()
+
+    # Safety: close HTML if truncated
+    if html_content and not html_content.strip().endswith("</html>"):
+        html_content += "\n</body></html>"
+
+    # Save today's topics to the coverage log
+    if html_content:
+        new_topics = extract_topics_from_html(html_content)
+        save_coverage_log(new_topics)
+
+    return html_content
+
+
+# --- SEND ---
+
 def send_email(html_content):
     today = datetime.now().strftime("%B %d, %Y")
-    subject = f"Bharosa Intel -- {today}"
+    is_monday = datetime.now().weekday() == 0
+    edition = "Monday Edition" if is_monday else today
+    subject = f"Bharosa Intel -- {edition}"
 
     recipients = [
         "santosh@bharosa.finance",
