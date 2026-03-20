@@ -348,11 +348,55 @@ WRITING RULES -- follow these exactly:
 
 Return only the complete HTML. No markdown. No backticks."""
 
+USER_MESSAGE_MONDAY = """Generate today's Bharosa intelligence memo. Today is {date} — Monday edition.
+
+SEARCH -- do all of these in order:
+0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" + "Copilot Money 2026" -- find the freshest competitor move from last 48 hours
+1. WEEK IN REVIEW: Search for the biggest fintech, AI, and India startup news from the past 7 days -- summarise into 4-5 sharp bullets. What moved last week that a founder should have seen?
+2. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" -- r/personalfinance, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/tax
+3. Twitter/X: "AI financial advisor" + "personal finance AI" -- find real debates
+4. Hacker News: "site:news.ycombinator.com personal finance AI" or "financial agent"
+5. Competitors: recent moves by INDmoney, Groww, Monarch Money, Copilot Money, Wealthfront
+6. Regulatory: recent SEBI, SEC, tax changes affecting personal finance
+7. AI news today: latest model launches, AI company moves, capability upgrades, AI policy changes
+8. World news: major global events, economic shifts, regulatory moves, India developments
+9. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" -- find upcoming events in the next 30 days only.
+
+MONDAY SPECIAL — include a "Last Week" section at the top of the body (right after Contrarian Bet, before User Signals) using this HTML block:
+
+<p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Last Week</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+<tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #ff9f0a;">
+  <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#ff9f0a;text-transform:uppercase;letter-spacing:1px;">Week in Review</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [BIGGEST STORY OF LAST WEEK — one punchy sentence]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [SECOND KEY DEVELOPMENT]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [THIRD KEY DEVELOPMENT]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [FOURTH KEY DEVELOPMENT]</p>
+  <p style="margin:0;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [FIFTH KEY DEVELOPMENT]</p>
+</td></tr>
+</table>
+
+WRITING RULES -- follow these exactly:
+- Every signal = 3 lines max: What's happening / Why it matters / What to build
+- AI Radar items = 2 lines max: What happened / Why it's interesting
+- World Signal items = 2 lines max: What happened / Why a founder should care
+- No consulting language. No "deterministic" or "orchestration" or "probabilistic"
+- Write like you're texting a cofounder at 9am
+- Signal first, context after. Never bury the insight.
+- Whole note readable in under 5 minutes on Mondays
+- All 6 conversation links must be DISCUSSION THREADS, not articles
+- Name specific competitors in every comparison
+- Events Radar: only show if real upcoming events found in next 30 days -- skip section entirely if nothing relevant
+
+Return only the complete HTML. No markdown. No backticks."""
 
 def generate_briefing():
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     today = datetime.now().strftime("%B %d, %Y")
+    is_monday = datetime.now().weekday() == 0
 
+    user_msg = USER_MESSAGE_MONDAY if is_monday else USER_MESSAGE
+    
     response = client.messages.create(
         model="claude-opus-4-6",
         max_tokens=8000,
@@ -360,7 +404,7 @@ def generate_briefing():
         tools=[{"type": "web_search_20250305", "name": "web_search"}],
         messages=[{
             "role": "user",
-            "content": USER_MESSAGE.format(date=today)
+            "content": user_msg.format(date=today)
         }]
     )
 
@@ -374,7 +418,6 @@ def generate_briefing():
 
     html_content = html_content.replace("```html", "").replace("```", "").strip()
 
-    # Safety check -- close HTML if truncated mid-generation
     if html_content and not html_content.strip().endswith("</html>"):
         html_content += "\n</body></html>"
 
