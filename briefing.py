@@ -2,6 +2,10 @@ import anthropic
 import smtplib
 import os
 import json
+import re
+import base64
+import urllib.request
+import urllib.error
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
@@ -12,37 +16,109 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 TO_EMAIL = os.environ["TO_EMAIL"]
-RADAR_URL = "https://bharosaradar.netlify.app"
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO = "santoshmaruwada/bharosa-briefing"
+RADAR_URL = "https://santoshmaruwada.github.io/bharosa-briefing/radar.html"
 COVERAGE_LOG = "coverage_log.json"
+
+# --- COMPETITOR LIST ---
+COMPETITORS = [
+    # India (20)
+    {"id": "groww", "name": "Groww", "geo": "India", "category": "Platform"},
+    {"id": "kuvera", "name": "Kuvera / CRED", "geo": "India", "category": "Platform"},
+    {"id": "indmoney", "name": "INDmoney", "geo": "India", "category": "AI Advisory"},
+    {"id": "jarvis", "name": "Jarvis Invest", "geo": "India", "category": "AI-Native"},
+    {"id": "zerodha", "name": "Zerodha", "geo": "India", "category": "Platform"},
+    {"id": "smallcase", "name": "Smallcase", "geo": "India", "category": "Platform"},
+    {"id": "investorai", "name": "InvestorAi", "geo": "India", "category": "AI-Native"},
+    {"id": "etmoney", "name": "ET Money", "geo": "India", "category": "Platform"},
+    {"id": "paytmmoney", "name": "Paytm Money", "geo": "India", "category": "Platform"},
+    {"id": "angelone", "name": "Angel One", "geo": "India", "category": "Platform"},
+    {"id": "upstox", "name": "Upstox", "geo": "India", "category": "Platform"},
+    {"id": "tickertape", "name": "Tickertape", "geo": "India", "category": "AI Advisory"},
+    {"id": "navi", "name": "Navi", "geo": "India", "category": "Platform"},
+    {"id": "wealthy", "name": "Wealthy.in", "geo": "India", "category": "AI Advisory"},
+    {"id": "dhan", "name": "Dhan", "geo": "India", "category": "Platform"},
+    {"id": "orowealth", "name": "Orowealth", "geo": "India", "category": "AI Advisory"},
+    {"id": "goalwise", "name": "Goalwise", "geo": "India", "category": "AI Advisory"},
+    {"id": "finity", "name": "Finity", "geo": "India", "category": "Platform"},
+    {"id": "plnr", "name": "PLNR", "geo": "India", "category": "AI-Native"},
+    {"id": "mprofit", "name": "mProfit", "geo": "India", "category": "Platform"},
+    # Global (30)
+    {"id": "origin", "name": "Origin Financial", "geo": "Global", "category": "AI Advisory"},
+    {"id": "wealthfront", "name": "Wealthfront", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "betterment", "name": "Betterment", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "portfoliopilot", "name": "PortfolioPilot", "geo": "Global", "category": "AI-Native"},
+    {"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting"},
+    {"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting"},
+    {"id": "conquest", "name": "Conquest Planning", "geo": "Global", "category": "AI Advisory"},
+    {"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native"},
+    {"id": "plum", "name": "Plum", "geo": "Global", "category": "Platform"},
+    {"id": "ynab", "name": "YNAB", "geo": "Global", "category": "Budgeting"},
+    {"id": "range", "name": "Range", "geo": "Global", "category": "AI Advisory"},
+    {"id": "rocketmoney", "name": "Rocket Money", "geo": "Global", "category": "Budgeting"},
+    {"id": "robinhood", "name": "Robinhood Gold", "geo": "Global", "category": "Platform"},
+    {"id": "schwab", "name": "Schwab Intelligent", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory"},
+    {"id": "wally", "name": "Wally", "geo": "Global", "category": "Budgeting"},
+    {"id": "acorns", "name": "Acorns", "geo": "Global", "category": "Platform"},
+    {"id": "arta", "name": "Arta Finance", "geo": "Global", "category": "AI-Native"},
+    {"id": "stashaway", "name": "StashAway", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "syfe", "name": "Syfe", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "endowus", "name": "Endowus", "geo": "Global", "category": "Platform"},
+    {"id": "magnifi", "name": "Magnifi", "geo": "Global", "category": "AI-Native"},
+    {"id": "moneylion", "name": "MoneyLion", "geo": "Global", "category": "Platform"},
+    {"id": "bambu", "name": "Bambu", "geo": "Global", "category": "AI Advisory"},
+    {"id": "savvy", "name": "Savvy Wealth", "geo": "Global", "category": "AI-Native"},
+    {"id": "scalable", "name": "Scalable Capital", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "nutmeg", "name": "Nutmeg", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "addepar", "name": "Addepar", "geo": "Global", "category": "Platform"},
+    {"id": "orion", "name": "Orion Advisor", "geo": "Global", "category": "Platform"},
+    {"id": "perfios", "name": "Perfios", "geo": "Global", "category": "AI-Native"},
+]
+
+# Baseline seed data for all competitors
+BASELINE_DATA = {c["id"]: {
+    "description": f"{c['name']} is a {c['category'].lower()} in the {c['geo']} market. Recent developments are being tracked.",
+    "fundingUpdated": "Tracking...",
+    "usersUpdated": "Tracking...",
+    "fundingDelta": "",
+    "usersDelta": "",
+    "aiScore": 45,
+    "aiScoreDelta": "",
+    "sentiment": 60,
+    "aiDepth": 40,
+    "orchestration": 30,
+    "indiaContext": 20 if c["geo"] == "Global" else 60,
+    "trust": 55,
+    "threat": "medium",
+    "grade": "B"
+} for c in COMPETITORS}
 
 # --- COVERAGE MEMORY ---
 
 def load_coverage_log():
-    """Load this week's coverage log. Returns list of covered topic strings."""
     if not Path(COVERAGE_LOG).exists():
         return []
     try:
         with open(COVERAGE_LOG, "r") as f:
             data = json.load(f)
-        # Reset if it's Monday or log is from a previous week
         today = datetime.now()
         log_date = datetime.fromisoformat(data.get("week_start", "2000-01-01"))
         days_since = (today - log_date).days
         if today.weekday() == 0 or days_since >= 7:
-            return []  # Fresh week
+            return []
         return data.get("topics", [])
     except Exception:
         return []
 
 def save_coverage_log(new_topics: list):
-    """Append today's topics to the coverage log."""
     existing = []
     week_start = datetime.now().isoformat()
     if Path(COVERAGE_LOG).exists():
         try:
             with open(COVERAGE_LOG, "r") as f:
                 data = json.load(f)
-            # Keep existing log if same week
             today = datetime.now()
             log_date = datetime.fromisoformat(data.get("week_start", "2000-01-01"))
             days_since = (today - log_date).days
@@ -51,46 +127,466 @@ def save_coverage_log(new_topics: list):
                 week_start = data.get("week_start", week_start)
         except Exception:
             pass
-    combined = list(dict.fromkeys(existing + new_topics))  # Dedupe, preserve order
+    combined = list(dict.fromkeys(existing + new_topics))
     with open(COVERAGE_LOG, "w") as f:
         json.dump({"week_start": week_start, "topics": combined}, f, indent=2)
 
 def extract_topics_from_html(html: str) -> list:
-    """Extract headline topics from generated HTML for the coverage log."""
-    import re
-    # Pull text from <h3>, <strong>, and <p font-weight:700> tags as topic markers
-    patterns = [
-        r'<h3[^>]*>(.*?)</h3>',
-        r'font-weight:700[^>]*>(.*?)</p>',
-    ]
+    patterns = [r'<h3[^>]*>(.*?)</h3>', r'font-weight:700[^>]*>(.*?)</p>']
     topics = []
     for pattern in patterns:
         matches = re.findall(pattern, html, re.DOTALL)
         for m in matches:
             clean = re.sub(r'<[^>]+>', '', m).strip()
-            if len(clean) > 20 and len(clean) < 200:
+            if 20 < len(clean) < 200:
                 topics.append(clean[:150])
-    return topics[:20]  # Cap at 20 topics per day
+    return topics[:20]
 
 def format_coverage_context(topics: list) -> str:
-    """Format covered topics into a prompt string for Opus."""
     if not topics:
         return ""
-    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    day_names = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     today_name = day_names[datetime.now().weekday()]
     lines = "\n".join(f"- {t}" for t in topics)
     return f"""
 ALREADY COVERED THIS WEEK — DO NOT REPEAT:
-The following topics/stories were already sent to the Bharosa team earlier this week. 
-Do NOT cover these again unless there is a genuinely significant new development (new data, major update, reversal, or follow-up that changes the picture).
-If you must reference them, label it clearly as "Update:" and explain what is new.
+The following topics were already sent earlier this week.
+Do NOT cover these again unless there is a genuinely significant new development.
+If you must reference them, label it "Update:" and state only what is new.
 
 {lines}
 
 Today is {today_name}. Find fresh signals the team has not seen yet this week.
 """
 
-# --- PROMPTS ---
+# --- RADAR GENERATION ---
+
+def generate_radar_data(client):
+    """Score all 50 competitors in batches of 10."""
+    print("Generating Radar data...")
+    all_data = dict(BASELINE_DATA)
+    batch_size = 10
+    ids = [c["id"] for c in COMPETITORS]
+    names = {c["id"]: c["name"] for c in COMPETITORS}
+
+    for i in range(0, len(ids), batch_size):
+        batch_ids = ids[i:i+batch_size]
+        batch_num = i // batch_size + 1
+        total_batches = (len(ids) + batch_size - 1) // batch_size
+        print(f"  Radar batch {batch_num}/{total_batches}...")
+
+        batch_names = [names[bid] for bid in batch_ids]
+        prompt = f"""You are scoring fintech competitors against Bharosa — an Indian personal finance AI with deep calculation engine, tax logic, and goal orchestration.
+
+Score these {len(batch_ids)} competitors: {', '.join(batch_names)}
+
+Return ONLY a raw JSON array starting with [ and ending with ]. No markdown. No explanation. No code fences.
+
+For each competitor return exactly this structure:
+[
+  {{
+    "id": "exact_id_from_list",
+    "description": "2 sentences. Include one specific recent development or product update.",
+    "fundingUpdated": "total funding raised e.g. $45M Series B",
+    "usersUpdated": "user count e.g. 2M users",
+    "fundingDelta": "+$20M Series A or empty string if unknown",
+    "usersDelta": "+500K users or empty string if unknown",
+    "aiScore": <number 0-100>,
+    "aiScoreDelta": "+5 or empty string",
+    "sentiment": <number 0-100>,
+    "aiDepth": <number 0-100>,
+    "orchestration": <number 0-100>,
+    "indiaContext": <number 0-100>,
+    "trust": <number 0-100>,
+    "threat": "high|medium|low|watch",
+    "grade": "A|B+|B|B-|C+|C|C-|D+|D"
+  }}
+]
+
+IDs to use: {json.dumps(batch_ids)}
+
+Scoring guide vs Bharosa:
+- aiDepth: sophistication of AI reasoning, not just features
+- orchestration: can they weave goals + data + tax + market in one reasoning loop? Bharosa can, most cannot
+- indiaContext: deep knowledge of Indian MF/SEBI/AMFI/LTCG/exit loads specifically
+- trust: 0=high commission conflicts, 100=zero commission fully transparent
+- threat: specifically to Bharosa's India-first personal finance AI position
+- grade: overall competitive threat grade to Bharosa"""
+
+        try:
+            import time
+            time.sleep(1)
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=4000,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            raw = response.content[0].text.strip()
+
+            # Robust JSON extraction
+            parsed = None
+            try:
+                parsed = json.loads(raw)
+            except Exception:
+                pass
+            if not parsed:
+                clean = re.sub(r'```[a-z]*\n?', '', raw).strip()
+                try:
+                    parsed = json.loads(clean)
+                except Exception:
+                    pass
+            if not parsed:
+                m = re.search(r'\[.*\]', raw, re.DOTALL)
+                if m:
+                    try:
+                        parsed = json.loads(m.group())
+                    except Exception:
+                        pass
+
+            if parsed and isinstance(parsed, list):
+                for item in parsed:
+                    if "id" in item and item["id"] in all_data:
+                        all_data[item["id"]].update(item)
+                print(f"  Batch {batch_num} OK — {len(parsed)} competitors scored")
+            else:
+                print(f"  Batch {batch_num} — parse failed, keeping baseline")
+
+        except Exception as e:
+            print(f"  Batch {batch_num} error: {e}")
+
+    return all_data
+
+
+def build_radar_html(radar_data: dict, generated_at: str) -> str:
+    """Build the full Bharosa Radar HTML with injected data."""
+
+    # Build competitor JS objects
+    comp_js_list = []
+    for c in COMPETITORS:
+        cid = c["id"]
+        d = radar_data.get(cid, BASELINE_DATA[cid])
+        threat_colors = {"high": "#ff453a", "medium": "#ff9f0a", "low": "#30d158", "watch": "#007aff"}
+        grade_colors = {"A": "#30d158", "B+": "#30d158", "B": "#ff9f0a", "B-": "#ff9f0a",
+                        "C+": "#ff9f0a", "C": "#ff453a", "C-": "#ff453a", "D+": "#ff453a", "D": "#ff453a"}
+        threat = d.get("threat", "medium")
+        grade = d.get("grade", "B")
+
+        obj = {
+            "id": cid,
+            "name": c["name"],
+            "geo": c["geo"],
+            "category": c["category"],
+            "grade": grade,
+            "gradeColor": grade_colors.get(grade, "#ff9f0a"),
+            "threat": threat,
+            "threatColor": threat_colors.get(threat, "#ff9f0a"),
+            "description": d.get("description", ""),
+            "fundingUpdated": d.get("fundingUpdated", "—"),
+            "usersUpdated": d.get("usersUpdated", "—"),
+            "fundingDelta": d.get("fundingDelta", ""),
+            "usersDelta": d.get("usersDelta", ""),
+            "aiScore": d.get("aiScore", 45),
+            "aiScoreDelta": d.get("aiScoreDelta", ""),
+            "sentiment": d.get("sentiment", 60),
+            "aiDepth": d.get("aiDepth", 40),
+            "orchestration": d.get("orchestration", 30),
+            "indiaContext": d.get("indiaContext", 40),
+            "trust": d.get("trust", 55),
+            "searchName": c["name"].lower(),
+        }
+        comp_js_list.append(json.dumps(obj))
+
+    competitors_js = "[\n" + ",\n".join(comp_js_list) + "\n]"
+    india_count = sum(1 for c in COMPETITORS if c["geo"] == "India")
+    high_threat = sum(1 for cid, d in radar_data.items() if d.get("threat") == "high")
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bharosa Radar — {generated_at}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{background:#0a0a0b;color:#e5e5ea;font-family:'DM Sans',sans-serif;min-height:100vh}}
+body::before{{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}}
+.sticky-bar{{position:sticky;top:0;z-index:100;background:rgba(10,10,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid #1c1c1e;padding:12px 32px;display:flex;align-items:center;justify-content:space-between}}
+.pulse{{width:8px;height:8px;background:#30d158;border-radius:50%;animation:pulse 2s infinite;display:inline-block;margin-right:8px}}
+@keyframes pulse{{0%,100%{{opacity:1;transform:scale(1)}}50%{{opacity:0.5;transform:scale(1.3)}}}}
+.hero{{padding:48px 32px 32px;position:relative;z-index:1}}
+.hero h1{{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}}
+.hero p{{color:#8e8e93;font-size:15px;margin-bottom:28px}}
+.stat-pills{{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}}
+.pill{{background:#1c1c1e;border:1px solid #2c2c2e;border-radius:10px;padding:14px 20px;text-align:center}}
+.pill-num{{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;display:block}}
+.pill-label{{font-size:11px;color:#8e8e93;text-transform:uppercase;letter-spacing:1px;margin-top:2px}}
+.controls{{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}}
+.filter-btn{{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}}
+.filter-btn.active,.filter-btn:hover{{background:#2c2c2e;color:#e5e5ea;border-color:#3a3a3c}}
+.search-box{{background:#1c1c1e;border:1px solid #2c2c2e;color:#e5e5ea;padding:7px 14px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;width:200px;outline:none}}
+.search-box:focus{{border-color:#3a3a3c}}
+.section-divider{{padding:12px 32px;font-size:11px;font-weight:700;letter-spacing:3px;color:#3a3a3c;text-transform:uppercase;border-top:1px solid #1c1c1e;margin-top:8px}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:0 32px 32px;position:relative;z-index:1}}
+.card{{background:#111113;border:1px solid #1c1c1e;border-radius:14px;padding:20px;transition:border-color 0.2s}}
+.card:hover{{border-color:#2c2c2e}}
+.card-top{{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}}
+.card-name{{font-size:16px;font-weight:600;letter-spacing:-0.3px}}
+.card-cat{{font-size:11px;color:#636366;margin-top:2px}}
+.badges{{display:flex;gap:6px;align-items:center;flex-shrink:0}}
+.badge{{padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}}
+.geo-badge{{background:#1c1c1e;color:#636366;padding:3px 8px;border-radius:5px;font-size:11px}}
+.desc{{font-size:13px;color:#8e8e93;line-height:1.6;margin-bottom:14px}}
+.radar-bars{{margin-bottom:14px}}
+.bar-row{{display:flex;align-items:center;gap:8px;margin-bottom:6px}}
+.bar-label{{font-size:11px;color:#636366;width:80px;flex-shrink:0}}
+.bar-track{{flex:1;background:#1c1c1e;border-radius:3px;height:4px;overflow:hidden}}
+.bar-fill{{height:100%;border-radius:3px;transition:width 1s ease;width:0}}
+.bar-val{{font-family:'DM Mono',monospace;font-size:11px;color:#636366;width:28px;text-align:right}}
+.stats-row{{display:flex;gap:8px;margin-bottom:14px}}
+.stat-box{{flex:1;background:#0a0a0b;border:1px solid #1c1c1e;border-radius:8px;padding:8px 10px}}
+.stat-box-label{{font-size:10px;color:#636366;text-transform:uppercase;letter-spacing:0.5px}}
+.stat-box-val{{font-size:13px;font-weight:600;margin-top:2px;font-family:'DM Mono',monospace}}
+.delta{{font-size:10px;font-weight:600;margin-left:4px}}
+.delta.pos{{color:#30d158}}.delta.neg{{color:#ff453a}}
+.links{{display:flex;gap:6px;flex-wrap:wrap}}
+.link-btn{{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;transition:all 0.2s}}
+.link-btn:hover{{background:#2c2c2e;color:#e5e5ea}}
+.hidden{{display:none}}
+.generated-note{{text-align:center;padding:24px;color:#3a3a3c;font-size:12px;font-family:'DM Mono',monospace}}
+</style>
+</head>
+<body>
+
+<div class="sticky-bar">
+  <div style="display:flex;align-items:center">
+    <span class="pulse"></span>
+    <span style="font-size:13px;font-weight:600;">Bharosa Radar</span>
+    <span style="font-size:12px;color:#636366;margin-left:12px;">Generated {generated_at}</span>
+  </div>
+  <div style="font-size:12px;color:#636366;">Daily snapshot · Read-only</div>
+</div>
+
+<div class="hero">
+  <h1>Competitor Radar</h1>
+  <p>50 players tracked. Scored daily against Bharosa's moat.</p>
+  <div class="stat-pills">
+    <div class="pill"><span class="pill-num" style="color:#30d158;">50</span><span class="pill-label">Players</span></div>
+    <div class="pill"><span class="pill-num" style="color:#007aff;">{india_count}</span><span class="pill-label">India</span></div>
+    <div class="pill"><span class="pill-num" style="color:#ff453a;" id="high-count">{high_threat}</span><span class="pill-label">High threat</span></div>
+    <div class="pill"><span class="pill-num" style="color:#ff9f0a;">30</span><span class="pill-label">Global</span></div>
+  </div>
+  <div class="controls">
+    <button class="filter-btn active" onclick="filter('all')">All</button>
+    <button class="filter-btn" onclick="filter('india')">India</button>
+    <button class="filter-btn" onclick="filter('global')">Global</button>
+    <button class="filter-btn" onclick="filter('high')">High threat</button>
+    <button class="filter-btn" onclick="filter('watch')">Watch</button>
+    <input class="search-box" type="text" placeholder="Search..." oninput="search(this.value)">
+    <select class="filter-btn" onchange="sort(this.value)" style="padding:7px 12px">
+      <option value="threat">Sort: Threat</option>
+      <option value="grade">Sort: Grade</option>
+      <option value="aiDepth">Sort: AI Depth</option>
+      <option value="name">Sort: A–Z</option>
+    </select>
+  </div>
+</div>
+
+<div id="india-divider" class="section-divider">India Players</div>
+<div id="india-grid" class="grid"></div>
+<div id="global-divider" class="section-divider">Global Players</div>
+<div id="global-grid" class="grid"></div>
+
+<div class="generated-note">Bharosa Radar · Generated {generated_at} · Scores updated daily at 9am IST</div>
+
+<script>
+const COMPETITORS = {competitors_js};
+
+let currentFilter = 'all';
+let currentSearch = '';
+let currentSort = 'threat';
+
+const threatOrder = {{'high':0,'medium':1,'watch':2,'low':3}};
+const gradeOrder = {{'A':0,'B+':1,'B':2,'B-':3,'C+':4,'C':5,'C-':6,'D+':7,'D':8}};
+
+function buildCard(c) {{
+  const encName = encodeURIComponent(c.name);
+  const newsUrl = `https://www.google.com/search?q=${{encName}}+fintech+news+2026`;
+  const fundUrl = `https://www.google.com/search?q=${{encName}}+funding+investment+2026`;
+  const revUrl = `https://www.google.com/search?q=${{encName}}+user+reviews+reddit`;
+  const siteUrl = `https://www.google.com/search?q=${{encName}}+official+site`;
+
+  const fdelta = c.fundingDelta ? `<span class="delta pos">${{c.fundingDelta}}</span>` : '';
+  const udelta = c.usersDelta ? `<span class="delta pos">${{c.usersDelta}}</span>` : '';
+  const adelta = c.aiScoreDelta ? `<span class="delta pos">${{c.aiScoreDelta}}</span>` : '';
+
+  const bars = [
+    ['AI Depth', c.aiDepth, '#af52de'],
+    ['Orchestrate', c.orchestration, '#007aff'],
+    ['India Ctx', c.indiaContext, '#ff9f0a'],
+    ['Trust', c.trust, '#30d158'],
+    ['Sentiment', c.sentiment, '#ff453a'],
+  ].map(([label, val, color]) => `
+    <div class="bar-row">
+      <span class="bar-label">${{label}}</span>
+      <div class="bar-track"><div class="bar-fill" data-width="${{val}}" style="background:${{color}};width:0%"></div></div>
+      <span class="bar-val">${{val}}</span>
+    </div>`).join('');
+
+  return `<div class="card" data-id="${{c.id}}" data-geo="${{c.geo.toLowerCase()}}" data-threat="${{c.threat}}">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${{c.name}}</div>
+        <div class="card-cat">${{c.category}}</div>
+      </div>
+      <div class="badges">
+        <span class="geo-badge">${{c.geo}}</span>
+        <span class="badge" style="background:${{c.gradeColor}}22;color:${{c.gradeColor}}">${{c.grade}}</span>
+        <span class="badge" style="background:${{c.threatColor}}22;color:${{c.threatColor}}">${{c.threat}}</span>
+      </div>
+    </div>
+    <div class="desc">${{c.description}}</div>
+    <div class="radar-bars">${{bars}}</div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-box-label">Funding</div>
+        <div class="stat-box-val">${{c.fundingUpdated}}${{fdelta}}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Users</div>
+        <div class="stat-box-val">${{c.usersUpdated}}${{udelta}}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">AI Score</div>
+        <div class="stat-box-val">${{c.aiScore}}${{adelta}}</div>
+      </div>
+    </div>
+    <div class="links">
+      <a class="link-btn" href="${{newsUrl}}" target="_blank">Latest news</a>
+      <a class="link-btn" href="${{fundUrl}}" target="_blank">Funding</a>
+      <a class="link-btn" href="${{revUrl}}" target="_blank">Reviews</a>
+      <a class="link-btn" href="${{siteUrl}}" target="_blank">Website</a>
+    </div>
+  </div>`;
+}}
+
+function render() {{
+  const india = document.getElementById('india-grid');
+  const global = document.getElementById('global-grid');
+  india.innerHTML = '';
+  global.innerHTML = '';
+
+  let sorted = [...COMPETITORS];
+  if (currentSort === 'threat') sorted.sort((a,b) => (threatOrder[a.threat]||9)-(threatOrder[b.threat]||9));
+  else if (currentSort === 'grade') sorted.sort((a,b) => (gradeOrder[a.grade]||9)-(gradeOrder[b.grade]||9));
+  else if (currentSort === 'aiDepth') sorted.sort((a,b) => b.aiDepth-a.aiDepth);
+  else if (currentSort === 'name') sorted.sort((a,b) => a.name.localeCompare(b.name));
+
+  let indiaVisible = 0, globalVisible = 0;
+
+  sorted.forEach(c => {{
+    const geoMatch = currentFilter === 'all' ||
+      (currentFilter === 'india' && c.geo === 'India') ||
+      (currentFilter === 'global' && c.geo === 'Global') ||
+      (currentFilter === 'high' && c.threat === 'high') ||
+      (currentFilter === 'watch' && c.threat === 'watch');
+    const searchMatch = !currentSearch || c.searchName.includes(currentSearch) ||
+      c.category.toLowerCase().includes(currentSearch) ||
+      c.geo.toLowerCase().includes(currentSearch);
+
+    if (geoMatch && searchMatch) {{
+      if (c.geo === 'India') {{ india.innerHTML += buildCard(c); indiaVisible++; }}
+      else {{ global.innerHTML += buildCard(c); globalVisible++; }}
+    }}
+  }});
+
+  document.getElementById('india-divider').style.display = indiaVisible ? '' : 'none';
+  document.getElementById('global-divider').style.display = globalVisible ? '' : 'none';
+
+  // Animate bars
+  setTimeout(() => {{
+    document.querySelectorAll('.bar-fill').forEach(el => {{
+      el.style.width = el.dataset.width + '%';
+    }});
+  }}, 100);
+}}
+
+function filter(f) {{
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  render();
+}}
+
+function search(val) {{
+  currentSearch = val.toLowerCase();
+  render();
+}}
+
+function sort(val) {{
+  currentSort = val;
+  render();
+}}
+
+render();
+</script>
+</body>
+</html>"""
+    return html
+
+
+def push_radar_to_github(html_content: str) -> bool:
+    """Push radar.html to GitHub repo via API."""
+    if not GITHUB_TOKEN:
+        print("No GITHUB_TOKEN — skipping radar push")
+        return False
+
+    try:
+        # Get current file SHA if it exists
+        api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/radar.html"
+        headers = {
+            "Authorization": f"token {GITHUB_TOKEN}",
+            "Content-Type": "application/json",
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "bharosa-briefing"
+        }
+
+        sha = None
+        try:
+            req = urllib.request.Request(api_url, headers=headers)
+            with urllib.request.urlopen(req) as resp:
+                existing = json.loads(resp.read())
+                sha = existing.get("sha")
+        except urllib.error.HTTPError as e:
+            if e.code != 404:
+                print(f"  GitHub GET error: {e.code}")
+
+        # Push updated file
+        content_b64 = base64.b64encode(html_content.encode("utf-8")).decode("utf-8")
+        today = datetime.now().strftime("%B %d, %Y")
+        payload = {
+            "message": f"Radar update {today}",
+            "content": content_b64,
+        }
+        if sha:
+            payload["sha"] = sha
+
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(api_url, data=data, headers=headers, method="PUT")
+        with urllib.request.urlopen(req) as resp:
+            if resp.status in (200, 201):
+                print(f"  Radar pushed to GitHub Pages: {RADAR_URL}")
+                return True
+            else:
+                print(f"  GitHub push failed: {resp.status}")
+                return False
+
+    except Exception as e:
+        print(f"  Radar push error: {e}")
+        return False
+
+
+# --- BRIEFING GENERATION ---
 
 SYSTEM_PROMPT = """You are Bharosa's daily intelligence engine.
 
@@ -107,59 +603,38 @@ AI threat: Generic GPT/Claude wrappers giving financial "advice" without real co
 
 YOUR JOB: Daily memo that makes Sahil and Santosh think "shit, we need to build this" or "this confirms we're early." Not a newsletter. Not a consulting report. A strategic shot of adrenaline.
 
-TONE RULES — THIS IS CRITICAL:
+TONE RULES:
 - Write like a sharp operator, not an analyst
 - Every signal = 3 lines max: What's happening, Why it matters, What Bharosa should do
-- No big words. No "deterministic reasoning" or "orchestration framework" or "probabilistic modelling"
-- Simple, fast, punchy sentences. Like texting a cofounder, not writing a whitepaper.
-- The whole note must be readable in under 4 minutes
+- No big words. No "deterministic reasoning" or "orchestration framework"
+- Simple, fast, punchy sentences. Like texting a cofounder at 9am.
 - Signal first, framing after. Never bury the insight.
 - Create urgency. Create paranoia. Create focus.
 
 SIGNAL QUALITY:
 - Reject anything generic. If you can swap "Bharosa" for "any fintech" — kill it.
-- Every Bharosa-specific signal must connect to: messy personal data, calculation engine, life questions, or infrastructure-for-AI positioning
-- Competitor mentions must name a specific company and state WHY they can't do what Bharosa does (architectural reason, one sentence)
-- The AI Radar and World Signals sections are broader — they don't need to be Bharosa-specific. They exist to keep founders informed and pattern-matching across domains.
+- Every signal must connect to: messy personal data, calculation engine, life questions, or infrastructure-for-AI positioning
+- Competitor mentions must name a specific company and state WHY they can't do what Bharosa does
 
-REPETITION RULES — CRITICAL:
-- If a topic appears in the "ALREADY COVERED THIS WEEK" list, skip it entirely unless there is a major new development
-- A "major new development" means: new data released, significant product update, regulatory decision, or story reversal — not just more commentary on the same event
+REPETITION RULES:
+- If a topic appears in the "ALREADY COVERED THIS WEEK" list, skip it unless there is a major new development
 - If you must reference a covered topic, start with "Update:" and state only what is NEW
-- The goal is that reading Monday, Wednesday, and Friday feels like three distinct, fresh briefings — not the same story told three ways
 
 SEARCH FOR RAW HUMAN CONVERSATIONS:
-- Reddit globally: r/personalfinance, r/financialindependence, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/FIREIndia, r/tax
+- Reddit: r/personalfinance, r/financialindependence, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/FIREIndia, r/tax
 - Twitter/X: fintech founders, advisors, AI researchers debating money tools
 - Hacker News: AI + finance threads with real skepticism
-- ONLY discussion threads with human replies in the Worth Reading section. Zero articles. Zero press releases.
+- ONLY discussion threads with human replies in Worth Reading. Zero articles.
 
-SECTION-SPECIFIC RULES:
+SECTION RULES:
 
-Top Competitor Watch block:
-- Find the single most newsworthy competitor move from the last 48 hours
-- Must be a NAMED competitor from the list — INDmoney, Groww, Monarch Money etc.
-- State what they did + one thing they still can't do that Bharosa can
-- Source must be real — funding news, product launch, user milestone, press coverage
+Top Competitor Watch: Find the single most newsworthy competitor move from last 48 hours. Must be NAMED. Real source only.
 
-AI Radar section:
-- 3-4 quick-hit AI updates from the last 24-48 hours
-- Can include: model launches, capability upgrades, AI policy moves, major AI company actions, open source releases, research breakthroughs
-- Each update = 2 lines max: what happened + why it's interesting
-- If any update has a direct Bharosa implication, flag it with "Bharosa angle:" in one sentence
+AI Radar: 3-4 AI updates from last 24-48 hours. 2 lines max each. Flag Bharosa angle if relevant.
 
-World Signals section:
-- 3-4 notable global actions, events, or decisions from the last 24-48 hours
-- Each = 2 lines max: what happened + why a founder should care
-- Not everything needs a Bharosa connection — general awareness matters too
+World Signals: 3-4 global developments. 2 lines max each. General founder awareness.
 
-Events Radar section:
-- Search for upcoming fintech, wealth, AI, and startup events in Mumbai and Bangalore only
-- Only include events happening in the NEXT 30 DAYS from today's date
-- If nothing relevant found, skip this section entirely — do not show it
-- Always flag Mumbai events with "Santosh, this is in your city."
-- Max 4 events. Prioritise Mumbai first, Bangalore second.
-- Include registration or info link for each event
+Events Radar: Upcoming fintech/AI/startup events in Mumbai and Bangalore only. Next 30 days. Skip if nothing found. Flag Mumbai events for Santosh.
 
 OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No backticks. No preamble. Stay under 8000 tokens.
 
@@ -186,7 +661,7 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr><td style="background:rgba(255,159,10,0.12);border-radius:10px;padding:16px 18px;border-left:3px solid #ff9f0a;">
     <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff9f0a;text-transform:uppercase;">Competitor Watch</p>
-    <p style="margin:0 0 4px;font-size:15px;color:#ffffff;line-height:1.5;font-weight:600;">[NAMED COMPETITOR] -- [What they just did or announced. One punchy sentence.]</p>
+    <p style="margin:0 0 4px;font-size:15px;color:#ffffff;line-height:1.5;font-weight:600;">[NAMED COMPETITOR] -- [What they just did. One punchy sentence.]</p>
     <p style="margin:0;font-size:13px;color:#ff9f0a;line-height:1.5;">-- [What this means for Bharosa. What they are still missing. One sentence.]</p>
   </td></tr>
   </table>
@@ -195,33 +670,32 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <!-- CONTRARIAN BET -->
 <tr><td style="background:#fff8f0;padding:14px 36px;border-bottom:1px solid #f2f2f7;">
   <p style="margin:0 0 2px;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff6b00;text-transform:uppercase;">Contrarian Bet</p>
-  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.5;font-weight:600;">[ONE SHARP SENTENCE challenging what most fintech founders or users believe about personal finance and AI. Must connect to why Bharosa's approach wins.]</p>
+  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.5;font-weight:600;">[ONE SHARP SENTENCE challenging what most fintech founders believe. Must connect to why Bharosa wins.]</p>
 </td></tr>
 
 <!-- BODY -->
 <tr><td style="padding:24px 36px 32px;">
 
-<!-- MONDAY ONLY: LAST WEEK RECAP — include this section only on Mondays -->
-<!-- Skip entirely on Wednesday and Friday -->
+<!-- MONDAY ONLY: LAST WEEK RECAP goes here -->
 
 <!-- USER SIGNALS -->
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">User Signals</p>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #007aff;">
-  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- specific user anxiety or behaviour. Short.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What is happening -- one sentence paraphrasing real online discussion.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters -- one sentence connecting to Bharosa's vision.]</p>
+  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- specific user anxiety. Short.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What is happening -- one sentence from real discussion.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters for Bharosa -- one sentence.]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Build: [What Bharosa should build. One sentence.]</p>
-  <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [Why they can't do this -- one sentence.] <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
+  <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [Why they can't do this.] <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #ff453a;">
-  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- trust barrier or resistance to AI financial tools]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What users are saying -- real sentiment, one sentence.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters -- what this means for how Bharosa should present itself.]</p>
+  <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- trust barrier or AI resistance]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What users are saying -- real sentiment.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters -- how Bharosa should present itself.]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Build: [Specific UX or positioning action.]</p>
   <p style="margin:0;font-size:12px;color:#8e8e93;">vs <strong>[NAMED COMPETITOR]</strong>: [One sentence.] <a href="[THREAD_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
@@ -233,7 +707,7 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #af52de;">
   <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- AI development that changes what Bharosa can build]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What changed -- one sentence. Plain language.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What changed -- one sentence.]</p>
   <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Why it matters for Bharosa specifically.]</p>
   <p style="margin:0 0 8px;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Do: [Specific action this week.]</p>
   <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
@@ -245,17 +719,17 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
-  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[NAMED COMPETITOR] -- [What they did, 5-8 words]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Where they stop -- the life question they still cannot answer. One sentence.]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#007aff;line-height:1.6;font-weight:600;">Bharosa edge: [One sentence -- architectural reason.]</p>
+  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[NAMED COMPETITOR] -- [What they did]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[Where they stop -- the life question they cannot answer.]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#007aff;line-height:1.6;font-weight:600;">Bharosa edge: [Architectural reason.]</p>
   <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
-  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[REGULATORY/MARKET SHIFT -- short headline]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What changed and why it matters. One sentence.]</p>
+  <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[REGULATORY/MARKET SHIFT]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#3a3a3c;line-height:1.6;">[What changed and why it matters.]</p>
   <p style="margin:0;font-size:14px;color:#30d158;line-height:1.6;font-weight:600;">Opportunity: [One sentence.]</p>
   <p style="margin:6px 0 0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
@@ -267,8 +741,8 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0faf4;border-radius:10px;padding:16px 18px;border-left:3px solid #30d158;">
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;font-style:italic;">[ONE sentence synthesising today's signals into a product gap.]</p>
-  <p style="margin:0 0 6px;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">1. [FEATURE NAME] -- [What it does, who it's for, one sentence.]</p>
-  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">2. [FEATURE NAME] -- [Buildable in 2-4 weeks. Addresses a signal from today.]</p>
+  <p style="margin:0 0 6px;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">1. [FEATURE] -- [What it does, who it's for.]</p>
+  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;font-weight:700;">2. [FEATURE] -- [Buildable in 2-4 weeks.]</p>
 </td></tr>
 </table>
 
@@ -278,26 +752,10 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f5f0ff;border-radius:10px;padding:16px 18px;">
-  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 1]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 2]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 3]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
-  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 4]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
+  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 1]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
+  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 2]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
+  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 3]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
+  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 4]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
 </td></tr>
 </table>
 
@@ -307,40 +765,23 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0f7ff;border-radius:10px;padding:16px 18px;">
-  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 1]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence -- what happened and why a founder should care.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 2]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 3]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
-  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;">
-    <strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 4]</strong><br>
-    <span style="color:#3a3a3c;">[One sentence.]</span><br>
-    <span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span>
-  </p>
+  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 1]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
+  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 2]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
+  <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 3]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
+  <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 4]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
 </td></tr>
 </table>
 
-<!-- EVENTS RADAR -- skip entirely if no events found in next 30 days -->
+<!-- EVENTS RADAR -- skip entirely if no events found -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Events Radar</p>
 <p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Upcoming in Mumbai and Bangalore worth your time.</p>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0fff4;border-radius:10px;padding:16px 18px;border-left:3px solid #30d158;">
   <p style="margin:0 0 12px;font-size:14px;color:#1c1c1e;line-height:1.6;">
     <strong>[EVENT NAME]</strong>
     <span style="background:#e8f5e9;color:#30d158;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-left:8px;text-transform:uppercase;">[CITY]</span>
     <span style="background:#f2f2f7;color:#636366;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:4px;">[DATE]</span><br>
-    <span style="color:#3a3a3c;">[One line -- why relevant to Bharosa.]</span><br>
+    <span style="color:#3a3a3c;">[Why relevant to Bharosa.]</span><br>
     <span style="color:#30d158;font-size:13px;font-weight:600;">[IF MUMBAI: Santosh, this is in your city.]</span>
     <span style="font-size:12px;color:#8e8e93;margin-left:8px;"><a href="[EVENT_URL]" style="color:#007aff;text-decoration:none;">Details</a></span>
   </p>
@@ -350,39 +791,14 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <!-- WORTH READING -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Worth Reading</p>
 <p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Real discussions. Not articles. Build intuition.</p>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
-  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
-    <span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span>
-    <a href="[REDDIT_URL_1]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
-    <span style="font-size:12px;color:#8e8e93;">[Why read -- one line]</span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
-    <span style="background:#000000;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">X</span>
-    <a href="[TWITTER_URL_1]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
-    <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
-    <span style="background:#ff6600;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">HN</span>
-    <a href="[HN_URL]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
-    <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
-    <span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span>
-    <a href="[REDDIT_URL_2]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
-    <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
-  </p>
-  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">
-    <span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span>
-    <a href="[REDDIT_URL_3]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
-    <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
-  </p>
-  <p style="margin:0;font-size:14px;line-height:1.6;">
-    <span style="background:#000000;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">X</span>
-    <a href="[TWITTER_URL_2]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
-    <span style="font-size:12px;color:#8e8e93;">[Why read]</span>
-  </p>
+  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;"><span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span><a href="[REDDIT_URL_1]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br><span style="font-size:12px;color:#8e8e93;">[Why read]</span></p>
+  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;"><span style="background:#000000;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">X</span><a href="[TWITTER_URL_1]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br><span style="font-size:12px;color:#8e8e93;">[Why read]</span></p>
+  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;"><span style="background:#ff6600;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">HN</span><a href="[HN_URL]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br><span style="font-size:12px;color:#8e8e93;">[Why read]</span></p>
+  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;"><span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span><a href="[REDDIT_URL_2]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br><span style="font-size:12px;color:#8e8e93;">[Why read]</span></p>
+  <p style="margin:0 0 10px;font-size:14px;line-height:1.6;"><span style="background:#ff4500;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">r/</span><a href="[REDDIT_URL_3]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br><span style="font-size:12px;color:#8e8e93;">[Why read]</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.6;"><span style="background:#000000;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:6px;">X</span><a href="[TWITTER_URL_2]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br><span style="font-size:12px;color:#8e8e93;">[Why read]</span></p>
 </td></tr>
 </table>
 
@@ -410,147 +826,98 @@ USER_MESSAGE = """Generate today's Bharosa intelligence memo. Today is {date}.
 
 {coverage_context}
 
-SEARCH -- do all of these in order:
-0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" + "Copilot Money 2026" -- find the freshest competitor move from last 48 hours
-1. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" -- r/personalfinance, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/tax
-2. Twitter/X: "AI financial advisor" + "personal finance AI" -- find real debates
-3. Hacker News: "site:news.ycombinator.com personal finance AI" or "financial agent"
-4. Competitors: recent moves by INDmoney, Groww, Monarch Money, Copilot Money, Wealthfront
-5. Regulatory: recent SEBI, SEC, tax changes affecting personal finance
-6. AI news today: latest model launches, AI company moves, capability upgrades, AI policy changes
-7. World news: major global events, economic shifts, regulatory moves, India developments
-8. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" -- find upcoming events in the next 30 days only. Ignore anything already past.
+SEARCH -- do all of these:
+0. Competitor news first: "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026"
+1. Reddit: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration"
+2. Twitter/X: "AI financial advisor" + "personal finance AI"
+3. Hacker News: "site:news.ycombinator.com personal finance AI"
+4. Regulatory: recent SEBI, SEC, tax changes
+5. AI news: latest model launches, AI company moves, capability upgrades
+6. World news: major global events, India developments
+7. Events: "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026"
 
-WRITING RULES:
-- Every signal = 3 lines max: What's happening / Why it matters / What to build
-- AI Radar and World Signal items = 2 lines max
-- No consulting language. Write like you're texting a cofounder at 9am
-- Signal first, context after. Never bury the insight.
-- All 6 conversation links must be DISCUSSION THREADS, not articles
-- Name specific competitors in every comparison
-- Events Radar: only show if real upcoming events found -- skip section entirely if nothing relevant
-- If a topic is in the ALREADY COVERED list above, skip it unless there is a major new development. If so, label it "Update:" and state only what is new.
+RULES:
+- 3 lines max per signal. AI/World items 2 lines max.
+- No consulting language. Cofounder voice at 9am.
+- All 6 Worth Reading links must be DISCUSSION THREADS only
+- Name specific competitors always
+- Events Radar: skip entirely if nothing found in next 30 days
+- Covered topics: skip unless major new development, then label "Update:"
 
-Return only the complete HTML. No markdown. No backticks."""
+Return only complete HTML. No markdown. No backticks."""
 
 USER_MESSAGE_MONDAY = """Generate today's Bharosa intelligence memo. Today is {date} — Monday edition.
 
 {coverage_context}
 
-SEARCH -- do all of these in order:
-0. Competitor news first: Search "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026" -- find the freshest competitor move from last 48 hours
-1. WEEK IN REVIEW: Search for the biggest fintech, AI, and India startup stories from the past 7 days -- find 5 sharp developments worth recapping
-2. Reddit GLOBAL: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration" -- r/personalfinance, r/fatFIRE, r/IndiaInvestments, r/tax
-3. Twitter/X: "AI financial advisor" + "personal finance AI" -- find real debates
-4. Hacker News: "site:news.ycombinator.com personal finance AI" or "financial agent"
-5. Competitors: recent moves by INDmoney, Groww, Monarch Money, Copilot Money, Wealthfront
-6. Regulatory: recent SEBI, SEC, tax changes affecting personal finance
-7. AI news today: latest model launches, AI company moves, capability upgrades
-8. World news: major global events, economic shifts, regulatory moves, India developments
-9. Events: Search "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026" + "startup meetup Mumbai March 2026" -- find upcoming events in the next 30 days only.
+SEARCH -- do all of these:
+0. Competitor news: "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026"
+1. WEEK IN REVIEW: biggest fintech, AI, India startup stories from last 7 days -- find 5 sharp bullets
+2. Reddit: "reddit personal finance AI tool" + "reddit ESOP tax decision"
+3. Twitter/X: "AI financial advisor" + "personal finance AI"
+4. Hacker News: "site:news.ycombinator.com personal finance AI"
+5. Regulatory: recent SEBI, SEC, tax changes
+6. AI news: latest model launches, AI company moves
+7. World news: major global events, India developments
+8. Events: "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026"
 
-MONDAY SPECIAL -- include a "Last Week" section right after the Contrarian Bet strip and before User Signals. Use this exact HTML:
+MONDAY SPECIAL -- include "Last Week" section right after the Contrarian Bet, before User Signals:
 
 <p style="margin:24px 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Last Week</p>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #ff9f0a;">
   <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#ff9f0a;text-transform:uppercase;letter-spacing:1px;">Week in Review</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [BIGGEST STORY OF LAST WEEK -- one punchy sentence with source link]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [SECOND KEY DEVELOPMENT]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [THIRD KEY DEVELOPMENT]</p>
-  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [FOURTH KEY DEVELOPMENT]</p>
-  <p style="margin:0;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [FIFTH KEY DEVELOPMENT]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [BIGGEST STORY -- one punchy sentence]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [SECOND DEVELOPMENT]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [THIRD DEVELOPMENT]</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [FOURTH DEVELOPMENT]</p>
+  <p style="margin:0;font-size:14px;color:#3a3a3c;line-height:1.7;">&#9679;&nbsp; [FIFTH DEVELOPMENT]</p>
 </td></tr>
 </table>
 
-WRITING RULES:
-- Every signal = 3 lines max: What's happening / Why it matters / What to build
-- AI Radar and World Signal items = 2 lines max
-- No consulting language. Write like you're texting a cofounder at 9am
-- Signal first, context after. Never bury the insight.
+RULES:
+- 3 lines max per signal. AI/World items 2 lines max.
+- No consulting language. Cofounder voice at 9am.
+- All 6 Worth Reading links must be DISCUSSION THREADS only
+- Name specific competitors always
+- Events Radar: skip entirely if nothing found in next 30 days
 - Whole note readable in under 5 minutes on Mondays
-- All 6 conversation links must be DISCUSSION THREADS, not articles
-- Name specific competitors in every comparison
-- Events Radar: only show if real upcoming events found -- skip section entirely if nothing relevant
 
-Return only the complete HTML. No markdown. No backticks."""
+Return only complete HTML. No markdown. No backticks."""
 
-
-# --- RADAR INJECTION ---
 
 def inject_radar_button(html_content: str, radar_url: str) -> str:
     radar_block = f"""
-<!-- COMPETITOR RADAR SECTION -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0 0;border-top:1px solid #e5e5ea;">
-  <tr>
-    <td style="padding:28px 36px 0;">
-      <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Competitor Radar</p>
-      <p style="margin:0 0 20px;font-size:13px;color:#8e8e93;line-height:1.5;">50 players tracked across India and the world -- AI depth, funding momentum, user growth, and threat to Bharosa. Updated with live AI research.</p>
-      <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-        <tr>
-          <td style="padding-right:10px;">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;">
-                <p style="margin:0;font-size:18px;font-weight:700;color:#00c47d;font-family:monospace;">50</p>
-                <p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">Players</p>
-              </td></tr>
-            </table>
-          </td>
-          <td style="padding-right:10px;">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;">
-                <p style="margin:0;font-size:18px;font-weight:700;color:#5b8df5;font-family:monospace;">20</p>
-                <p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">India</p>
-              </td></tr>
-            </table>
-          </td>
-          <td>
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;">
-                <p style="margin:0;font-size:18px;font-weight:700;color:#ff453a;font-family:monospace;">19</p>
-                <p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">High threat</p>
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f9fb;border-radius:10px;margin-bottom:22px;">
-        <tr><td style="padding:16px 18px;">
-          <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#00c47d;">&#9679;</strong>&nbsp; Live AI research -- click Refresh to re-score all 50 players</p>
-          <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#5b8df5;">&#9679;</strong>&nbsp; Radar bars: AI depth, orchestration, India context, trust, sentiment</p>
-          <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#af52de;">&#9679;</strong>&nbsp; Progress tracker: funding deltas, user growth, AI score trends</p>
-          <p style="margin:0;font-size:13px;color:#3a3a3c;line-height:1.6;"><strong style="color:#ff9f0a;">&#9679;</strong>&nbsp; Clickable links to latest news, funding rounds, and user reviews</p>
-        </td></tr>
-      </table>
-      <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="background:#00c47d;border-radius:10px;">
-          <a href="{radar_url}" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.02em;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">Open Competitor Radar &nbsp;&#8594;</a>
-        </td></tr>
-      </table>
-      <p style="margin:14px 0 0;font-size:11px;color:#aeaeb2;">Opens in browser. Hit <strong>Refresh Radar</strong> inside the dashboard to pull the latest AI research across all 50 players.</p>
-    </td>
-  </tr>
+  <tr><td style="padding:28px 36px 0;">
+    <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Competitor Radar</p>
+    <p style="margin:0 0 16px;font-size:13px;color:#8e8e93;line-height:1.5;">50 competitors scored daily -- AI depth, funding, user growth, threat to Bharosa. Fresh data generated this morning.</p>
+    <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="padding-right:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;"><p style="margin:0;font-size:18px;font-weight:700;color:#00c47d;font-family:monospace;">50</p><p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">Players</p></td></tr></table></td>
+        <td style="padding-right:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;"><p style="margin:0;font-size:18px;font-weight:700;color:#5b8df5;font-family:monospace;">20</p><p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">India</p></td></tr></table></td>
+        <td><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;"><p style="margin:0;font-size:18px;font-weight:700;color:#ff453a;font-family:monospace;">30</p><p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">Global</p></td></tr></table></td>
+      </tr>
+    </table>
+    <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+      <tr><td style="background:#00c47d;border-radius:10px;">
+        <a href="{radar_url}" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">Open Competitor Radar &nbsp;&#8594;</a>
+      </td></tr>
+    </table>
+    <p style="margin:0;font-size:11px;color:#aeaeb2;">Opens in browser. Today's scores generated fresh at 9am IST.</p>
+  </td></tr>
 </table>
-<!-- END COMPETITOR RADAR SECTION -->
 """
     if "</body>" in html_content:
         return html_content.replace("</body>", radar_block + "\n</body>", 1)
-    else:
-        return html_content + radar_block
+    return html_content + radar_block
 
 
-# --- GENERATE ---
-
-def generate_briefing():
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+def generate_briefing(client):
     today = datetime.now().strftime("%B %d, %Y")
     is_monday = datetime.now().weekday() == 0
-
-    # Load what was already covered this week
     covered_topics = load_coverage_log()
     coverage_context = format_coverage_context(covered_topics)
-
-    # Pick Monday or regular message
     template = USER_MESSAGE_MONDAY if is_monday else USER_MESSAGE
 
     response = client.messages.create(
@@ -558,10 +925,7 @@ def generate_briefing():
         max_tokens=8000,
         system=SYSTEM_PROMPT,
         tools=[{"type": "web_search_20250305", "name": "web_search"}],
-        messages=[{
-            "role": "user",
-            "content": template.format(date=today, coverage_context=coverage_context)
-        }]
+        messages=[{"role": "user", "content": template.format(date=today, coverage_context=coverage_context)}]
     )
 
     html_content = ""
@@ -573,26 +937,19 @@ def generate_briefing():
                 break
 
     html_content = html_content.replace("```html", "").replace("```", "").strip()
-
-    # Safety: close HTML if truncated
     if html_content and not html_content.strip().endswith("</html>"):
         html_content += "\n</body></html>"
 
-    # Save today's topics to the coverage log
     if html_content:
-        new_topics = extract_topics_from_html(html_content)
-        save_coverage_log(new_topics)
+        save_coverage_log(extract_topics_from_html(html_content))
 
     return html_content
 
 
-# --- SEND ---
-
 def send_email(html_content):
     today = datetime.now().strftime("%B %d, %Y")
     is_monday = datetime.now().weekday() == 0
-    edition = "Monday Edition" if is_monday else today
-    subject = f"Bharosa Intel -- {edition}"
+    subject = f"Bharosa Intel -- {'Monday Edition' if is_monday else today}"
 
     recipients = [
         "santosh@bharosa.finance",
@@ -606,26 +963,40 @@ def send_email(html_content):
     ]
 
     final_html = inject_radar_button(html_content, RADAR_URL)
-
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"Bharosa Intel <{GMAIL_USER}>"
     msg["To"] = ", ".join(recipients)
-
-    plain_text = f"Bharosa Intel -- {today}\n\nOpen in an HTML email client to view."
-    msg.attach(MIMEText(plain_text, "plain"))
+    msg.attach(MIMEText(f"Bharosa Intel -- {today}\n\nOpen in HTML email client to view.", "plain"))
     msg.attach(MIMEText(final_html, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
         server.sendmail(GMAIL_USER, recipients, msg.as_string())
 
-    print(f"Sent to {len(recipients)} recipients")
+    print(f"Email sent to {len(recipients)} recipients")
 
 
 if __name__ == "__main__":
-    print("Generating...")
-    html = generate_briefing()
-    print("Sending...")
-    send_email(html)
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+
+    print("Step 1: Generating daily briefing...")
+    briefing_html = generate_briefing(client)
+    print("Briefing generated.")
+
+    print("Step 2: Generating Radar data for 50 competitors...")
+    radar_data = generate_radar_data(client)
+    print("Radar data generated.")
+
+    print("Step 3: Building Radar HTML...")
+    generated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p IST")
+    radar_html = build_radar_html(radar_data, generated_at)
+    print("Radar HTML built.")
+
+    print("Step 4: Pushing Radar to GitHub Pages...")
+    push_radar_to_github(radar_html)
+
+    print("Step 5: Sending email...")
+    send_email(briefing_html)
+
     print("Done!")
