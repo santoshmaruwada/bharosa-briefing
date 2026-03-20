@@ -1,8 +1,283 @@
 <!DOCTYPE html>
-<html>
-<head><title>Bharosa Radar</title></head>
-<body style="background:#1c1c1e;color:#fff;font-family:sans-serif;text-align:center;padding:100px;">
-  <h1>Bharosa Radar</h1>
-  <p>First report generates at 9am IST tomorrow.</p>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bharosa Radar — March 20, 2026 at 05:51 AM IST</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0b;color:#e5e5ea;font-family:'DM Sans',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
+.sticky-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid #1c1c1e;padding:12px 32px;display:flex;align-items:center;justify-content:space-between}
+.pulse{width:8px;height:8px;background:#30d158;border-radius:50%;animation:pulse 2s infinite;display:inline-block;margin-right:8px}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.hero{padding:48px 32px 32px;position:relative;z-index:1}
+.hero h1{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}
+.hero p{color:#8e8e93;font-size:15px;margin-bottom:28px}
+.stat-pills{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+.pill{background:#1c1c1e;border:1px solid #2c2c2e;border-radius:10px;padding:14px 20px;text-align:center}
+.pill-num{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;display:block}
+.pill-label{font-size:11px;color:#8e8e93;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.filter-btn{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.filter-btn.active,.filter-btn:hover{background:#2c2c2e;color:#e5e5ea;border-color:#3a3a3c}
+.search-box{background:#1c1c1e;border:1px solid #2c2c2e;color:#e5e5ea;padding:7px 14px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;width:200px;outline:none}
+.search-box:focus{border-color:#3a3a3c}
+.section-divider{padding:12px 32px;font-size:11px;font-weight:700;letter-spacing:3px;color:#3a3a3c;text-transform:uppercase;border-top:1px solid #1c1c1e;margin-top:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:0 32px 32px;position:relative;z-index:1}
+.card{background:#111113;border:1px solid #1c1c1e;border-radius:14px;padding:20px;transition:border-color 0.2s}
+.card:hover{border-color:#2c2c2e}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.card-name{font-size:16px;font-weight:600;letter-spacing:-0.3px}
+.card-cat{font-size:11px;color:#636366;margin-top:2px}
+.badges{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.badge{padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
+.geo-badge{background:#1c1c1e;color:#636366;padding:3px 8px;border-radius:5px;font-size:11px}
+.desc{font-size:13px;color:#8e8e93;line-height:1.6;margin-bottom:14px}
+.radar-bars{margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-label{font-size:11px;color:#636366;width:80px;flex-shrink:0}
+.bar-track{flex:1;background:#1c1c1e;border-radius:3px;height:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1s ease;width:0}
+.bar-val{font-family:'DM Mono',monospace;font-size:11px;color:#636366;width:28px;text-align:right}
+.stats-row{display:flex;gap:8px;margin-bottom:14px}
+.stat-box{flex:1;background:#0a0a0b;border:1px solid #1c1c1e;border-radius:8px;padding:8px 10px}
+.stat-box-label{font-size:10px;color:#636366;text-transform:uppercase;letter-spacing:0.5px}
+.stat-box-val{font-size:13px;font-weight:600;margin-top:2px;font-family:'DM Mono',monospace}
+.delta{font-size:10px;font-weight:600;margin-left:4px}
+.delta.pos{color:#30d158}.delta.neg{color:#ff453a}
+.links{display:flex;gap:6px;flex-wrap:wrap}
+.link-btn{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;transition:all 0.2s}
+.link-btn:hover{background:#2c2c2e;color:#e5e5ea}
+.hidden{display:none}
+.generated-note{text-align:center;padding:24px;color:#3a3a3c;font-size:12px;font-family:'DM Mono',monospace}
+</style>
+</head>
+<body>
+
+<div class="sticky-bar">
+  <div style="display:flex;align-items:center">
+    <span class="pulse"></span>
+    <span style="font-size:13px;font-weight:600;">Bharosa Radar</span>
+    <span style="font-size:12px;color:#636366;margin-left:12px;">Generated March 20, 2026 at 05:51 AM IST</span>
+  </div>
+  <div style="font-size:12px;color:#636366;">Daily snapshot · Read-only</div>
+</div>
+
+<div class="hero">
+  <h1>Competitor Radar</h1>
+  <p>50 players tracked. Scored daily against Bharosa's moat.</p>
+  <div class="stat-pills">
+    <div class="pill"><span class="pill-num" style="color:#30d158;">50</span><span class="pill-label">Players</span></div>
+    <div class="pill"><span class="pill-num" style="color:#007aff;">20</span><span class="pill-label">India</span></div>
+    <div class="pill"><span class="pill-num" style="color:#ff453a;" id="high-count">6</span><span class="pill-label">High threat</span></div>
+    <div class="pill"><span class="pill-num" style="color:#ff9f0a;">30</span><span class="pill-label">Global</span></div>
+  </div>
+  <div class="controls">
+    <button class="filter-btn active" onclick="filter('all')">All</button>
+    <button class="filter-btn" onclick="filter('india')">India</button>
+    <button class="filter-btn" onclick="filter('global')">Global</button>
+    <button class="filter-btn" onclick="filter('high')">High threat</button>
+    <button class="filter-btn" onclick="filter('watch')">Watch</button>
+    <input class="search-box" type="text" placeholder="Search..." oninput="search(this.value)">
+    <select class="filter-btn" onchange="sort(this.value)" style="padding:7px 12px">
+      <option value="threat">Sort: Threat</option>
+      <option value="grade">Sort: Grade</option>
+      <option value="aiDepth">Sort: AI Depth</option>
+      <option value="name">Sort: A–Z</option>
+    </select>
+  </div>
+</div>
+
+<div id="india-divider" class="section-divider">India Players</div>
+<div id="india-grid" class="grid"></div>
+<div id="global-divider" class="section-divider">Global Players</div>
+<div id="global-grid" class="grid"></div>
+
+<div class="generated-note">Bharosa Radar · Generated March 20, 2026 at 05:51 AM IST · Scores updated daily at 9am IST</div>
+
+<script>
+const COMPETITORS = [
+{"id": "groww", "name": "Groww", "geo": "India", "category": "Platform", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Direct mutual fund and stock investment platform with 5+ million users focusing on simplicity and education. Recently launched Groww Gold and expanded into lending products with personal loans.", "fundingUpdated": "$251M Series D", "usersUpdated": "5M users", "fundingDelta": "+$83M Series D", "usersDelta": "+2M users", "aiScore": 25, "aiScoreDelta": "+5", "sentiment": 85, "aiDepth": 20, "orchestration": 15, "indiaContext": 90, "trust": 85, "searchName": "groww"},
+{"id": "kuvera", "name": "Kuvera / CRED", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Zero-commission mutual fund platform with comprehensive portfolio tracking and goal-based investing. Recently integrated with multiple banks for automated investment tracking and launched advanced SIP features.", "fundingUpdated": "$8M Series A", "usersUpdated": "500K users", "fundingDelta": "", "usersDelta": "+100K users", "aiScore": 35, "aiScoreDelta": "", "sentiment": 75, "aiDepth": 30, "orchestration": 40, "indiaContext": 95, "trust": 95, "searchName": "kuvera / cred"},
+{"id": "indmoney", "name": "INDmoney", "geo": "India", "category": "AI Advisory", "grade": "B+", "gradeColor": "#30d158", "threat": "high", "threatColor": "#ff453a", "description": "Unified platform for mutual funds, stocks, US stocks, and financial tracking with AI-powered insights. Recently launched credit score monitoring and expanded US stock offerings with fractional investing.", "fundingUpdated": "$86M Series B", "usersUpdated": "7M users", "fundingDelta": "+$60M Series B", "usersDelta": "+5M users", "aiScore": 45, "aiScoreDelta": "+10", "sentiment": 80, "aiDepth": 40, "orchestration": 50, "indiaContext": 85, "trust": 80, "searchName": "indmoney"},
+{"id": "jarvis", "name": "Jarvis Invest", "geo": "India", "category": "AI-Native", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "AI-powered investment advisory platform using machine learning for portfolio recommendations and risk assessment. Recently enhanced their ML models with behavioral finance inputs and launched personalized rebalancing algorithms.", "fundingUpdated": "$5M Seed", "usersUpdated": "100K users", "fundingDelta": "", "usersDelta": "", "aiScore": 60, "aiScoreDelta": "+15", "sentiment": 70, "aiDepth": 65, "orchestration": 45, "indiaContext": 80, "trust": 75, "searchName": "jarvis invest"},
+{"id": "zerodha", "name": "Zerodha", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Largest discount brokerage in India with 6+ million active users, known for zero brokerage on equity delivery. Recently launched Zerodha School educational platform and enhanced Coin mutual fund offerings with better analytics.", "fundingUpdated": "Bootstrapped", "usersUpdated": "6.4M users", "fundingDelta": "", "usersDelta": "+800K users", "aiScore": 30, "aiScoreDelta": "", "sentiment": 90, "aiDepth": 25, "orchestration": 20, "indiaContext": 95, "trust": 90, "searchName": "zerodha"},
+{"id": "smallcase", "name": "Smallcase", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Thematic investment platform offering professionally managed portfolios and systematic investment strategies. Recently launched Leap, an options trading platform, and enhanced their rebalancing algorithms with tax optimization.", "fundingUpdated": "$40M Series C", "usersUpdated": "8M users", "fundingDelta": "+$14M Series C", "usersDelta": "+3M users", "aiScore": 40, "aiScoreDelta": "+8", "sentiment": 85, "aiDepth": 35, "orchestration": 35, "indiaContext": 90, "trust": 85, "searchName": "smallcase"},
+{"id": "investorai", "name": "InvestorAi", "geo": "India", "category": "AI-Native", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "AI-driven investment research and portfolio management platform with automated stock picking algorithms. Recently launched sentiment analysis tools and enhanced their machine learning models with real-time news integration.", "fundingUpdated": "$2M Pre-Series A", "usersUpdated": "50K users", "fundingDelta": "", "usersDelta": "", "aiScore": 70, "aiScoreDelta": "+20", "sentiment": 65, "aiDepth": 75, "orchestration": 40, "indiaContext": 75, "trust": 70, "searchName": "investorai"},
+{"id": "etmoney", "name": "ET Money", "geo": "India", "category": "Platform", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Personal finance app offering mutual funds, insurance, and expense tracking with goal-based planning. Recently integrated UPI payments and launched ET Money Genius, an AI-powered financial advisory feature.", "fundingUpdated": "$30M Series B", "usersUpdated": "5M users", "fundingDelta": "", "usersDelta": "+1M users", "aiScore": 35, "aiScoreDelta": "+10", "sentiment": 75, "aiDepth": 30, "orchestration": 45, "indiaContext": 90, "trust": 80, "searchName": "et money"},
+{"id": "paytmmoney", "name": "Paytm Money", "geo": "India", "category": "Platform", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Investment platform from Paytm ecosystem offering stocks and mutual funds with integrated payments. Recently launched Paytm Money Pro with advanced charting tools and enhanced their mutual fund recommendation engine.", "fundingUpdated": "$60M (Part of Paytm)", "usersUpdated": "4M users", "fundingDelta": "", "usersDelta": "+500K users", "aiScore": 25, "aiScoreDelta": "+3", "sentiment": 70, "aiDepth": 20, "orchestration": 25, "indiaContext": 85, "trust": 75, "searchName": "paytm money"},
+{"id": "angelone", "name": "Angel One", "geo": "India", "category": "Platform", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Full-service to discount brokerage transformation with 12+ million users offering stocks, mutual funds, and derivatives. Recently launched Angel AI for market insights and enhanced their mobile trading platform with personalized recommendations.", "fundingUpdated": "Listed (NSE: ANGELONE)", "usersUpdated": "12M users", "fundingDelta": "", "usersDelta": "+2M users", "aiScore": 30, "aiScoreDelta": "+8", "sentiment": 80, "aiDepth": 25, "orchestration": 20, "indiaContext": 90, "trust": 80, "searchName": "angel one"},
+{"id": "upstox", "name": "Upstox", "geo": "India", "category": "Platform", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Discount brokerage platform focused on trading and basic investment services. Recently launched Upstox Pro mobile app with advanced charting and real-time market data.", "fundingUpdated": "$25M Series B", "usersUpdated": "10M users", "fundingDelta": "", "usersDelta": "+2M users", "aiScore": 25, "aiScoreDelta": "", "sentiment": 75, "aiDepth": 15, "orchestration": 20, "indiaContext": 80, "trust": 70, "searchName": "upstox"},
+{"id": "tickertape", "name": "Tickertape", "geo": "India", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Investment research and portfolio analysis platform with screening tools and fundamental data. Recently added mutual fund recommendations and SIP tracking features.", "fundingUpdated": "$8.5M Series A", "usersUpdated": "1M users", "fundingDelta": "", "usersDelta": "+300K users", "aiScore": 45, "aiScoreDelta": "+10", "sentiment": 80, "aiDepth": 35, "orchestration": 30, "indiaContext": 85, "trust": 85, "searchName": "tickertape"},
+{"id": "navi", "name": "Navi", "geo": "India", "category": "Platform", "grade": "B+", "gradeColor": "#30d158", "threat": "high", "threatColor": "#ff453a", "description": "Digital-first financial services offering personal loans, mutual funds, and insurance products. Recently launched Navi Money Management app with AI-driven spending insights and goal tracking.", "fundingUpdated": "$400M Series E", "usersUpdated": "8M users", "fundingDelta": "+$180M Series E", "usersDelta": "+3M users", "aiScore": 55, "aiScoreDelta": "+15", "sentiment": 70, "aiDepth": 45, "orchestration": 50, "indiaContext": 90, "trust": 75, "searchName": "navi"},
+{"id": "wealthy", "name": "Wealthy.in", "geo": "India", "category": "AI Advisory", "grade": "A", "gradeColor": "#30d158", "threat": "high", "threatColor": "#ff453a", "description": "Robo-advisory platform specializing in goal-based investing and portfolio management. Recently integrated tax-loss harvesting and rebalancing automation for Indian tax optimization.", "fundingUpdated": "$12M Series A", "usersUpdated": "200K users", "fundingDelta": "", "usersDelta": "+50K users", "aiScore": 70, "aiScoreDelta": "+8", "sentiment": 85, "aiDepth": 65, "orchestration": 70, "indiaContext": 95, "trust": 90, "searchName": "wealthy.in"},
+{"id": "dhan", "name": "Dhan", "geo": "India", "category": "Platform", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Modern brokerage platform with focus on trading and investment analytics. Recently launched Dhan Goals feature for SIP management and portfolio rebalancing with basic AI recommendations.", "fundingUpdated": "$21.7M Series A", "usersUpdated": "1.5M users", "fundingDelta": "+$21.7M Series A", "usersDelta": "+800K users", "aiScore": 40, "aiScoreDelta": "+12", "sentiment": 80, "aiDepth": 30, "orchestration": 35, "indiaContext": 85, "trust": 80, "searchName": "dhan"},
+{"id": "orowealth", "name": "Orowealth", "geo": "India", "category": "AI Advisory", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Wealth management platform offering personalized investment advisory and portfolio management services. Recently partnered with leading AMCs to provide direct mutual fund investing with zero commission structure.", "fundingUpdated": "$5M Seed", "usersUpdated": "100K users", "fundingDelta": "", "usersDelta": "+25K users", "aiScore": 35, "aiScoreDelta": "", "sentiment": 75, "aiDepth": 25, "orchestration": 40, "indiaContext": 85, "trust": 85, "searchName": "orowealth"},
+{"id": "goalwise", "name": "Goalwise", "geo": "India", "category": "AI Advisory", "grade": "B+", "gradeColor": "#30d158", "threat": "medium", "threatColor": "#ff9f0a", "description": "Goal-based investment platform using systematic investment plans and portfolio optimization. Recently launched tax-smart investing feature with automated ELSS allocation and capital gains optimization.", "fundingUpdated": "$6M Series A", "usersUpdated": "150K users", "fundingDelta": "", "usersDelta": "+40K users", "aiScore": 60, "aiScoreDelta": "+5", "sentiment": 80, "aiDepth": 50, "orchestration": 65, "indiaContext": 90, "trust": 90, "searchName": "goalwise"},
+{"id": "finity", "name": "Finity", "geo": "India", "category": "Platform", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "Personal finance management app with expense tracking and investment planning capabilities. Recently added AI-powered financial health scoring and personalized saving recommendations.", "fundingUpdated": "$2.5M Seed", "usersUpdated": "75K users", "fundingDelta": "+$2.5M Seed", "usersDelta": "+30K users", "aiScore": 50, "aiScoreDelta": "+20", "sentiment": 70, "aiDepth": 40, "orchestration": 45, "indiaContext": 80, "trust": 80, "searchName": "finity"},
+{"id": "plnr", "name": "PLNR", "geo": "India", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Comprehensive financial planning platform offering goal-based investing and retirement planning. Recently launched AI-driven financial advisor chatbot with tax planning and insurance optimization features.", "fundingUpdated": "$4M Series A", "usersUpdated": "120K users", "fundingDelta": "", "usersDelta": "+35K users", "aiScore": 65, "aiScoreDelta": "+18", "sentiment": 75, "aiDepth": 55, "orchestration": 60, "indiaContext": 85, "trust": 85, "searchName": "plnr"},
+{"id": "mprofit", "name": "mProfit", "geo": "India", "category": "Platform", "grade": "C", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "Portfolio management and tracking software for serious investors and financial advisors. Recently added automated tax reporting for Indian capital gains and dividend tracking with direct AMC integration.", "fundingUpdated": "$3M Bootstrap", "usersUpdated": "50K users", "fundingDelta": "", "usersDelta": "+10K users", "aiScore": 30, "aiScoreDelta": "", "sentiment": 80, "aiDepth": 20, "orchestration": 25, "indiaContext": 95, "trust": 95, "searchName": "mprofit"},
+{"id": "origin", "name": "Origin Financial", "geo": "Global", "category": "AI Advisory", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Origin Financial is a US-based financial planning platform focused on helping users optimize their financial decisions through comprehensive planning tools. The company recently enhanced its platform with improved debt optimization features and expanded its advisory services.", "fundingUpdated": "$38M Series A", "usersUpdated": "150K users", "fundingDelta": "+$38M Series A", "usersDelta": "+100K users", "aiScore": 65, "aiScoreDelta": "+10", "sentiment": 75, "aiDepth": 60, "orchestration": 55, "indiaContext": 5, "trust": 80, "searchName": "origin financial"},
+{"id": "wealthfront", "name": "Wealthfront", "geo": "Global", "category": "Robo-advisor", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Wealthfront is a leading US robo-advisor offering automated investing and financial planning with tax-loss harvesting capabilities. The platform recently launched enhanced direct indexing features and expanded its cash management offerings with higher yield savings accounts.", "fundingUpdated": "$204M Series E", "usersUpdated": "700K users", "fundingDelta": "", "usersDelta": "+50K users", "aiScore": 70, "aiScoreDelta": "+3", "sentiment": 80, "aiDepth": 65, "orchestration": 70, "indiaContext": 0, "trust": 85, "searchName": "wealthfront"},
+{"id": "betterment", "name": "Betterment", "geo": "Global", "category": "Robo-advisor", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Betterment is a prominent US robo-advisor providing automated investing and retirement planning services with goal-based portfolio management. The company recently introduced enhanced crypto investing options and expanded its 401(k) management platform for employers.", "fundingUpdated": "$275M Series F", "usersUpdated": "800K users", "fundingDelta": "", "usersDelta": "+25K users", "aiScore": 72, "aiScoreDelta": "+2", "sentiment": 82, "aiDepth": 68, "orchestration": 75, "indiaContext": 0, "trust": 88, "searchName": "betterment"},
+{"id": "portfoliopilot", "name": "PortfolioPilot", "geo": "Global", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "PortfolioPilot is an AI-powered investment management platform that provides personalized portfolio recommendations and risk analysis. The platform recently integrated advanced market sentiment analysis and launched real-time portfolio rebalancing features.", "fundingUpdated": "$15M Series A", "usersUpdated": "75K users", "fundingDelta": "+$15M Series A", "usersDelta": "+50K users", "aiScore": 78, "aiScoreDelta": "+15", "sentiment": 70, "aiDepth": 75, "orchestration": 60, "indiaContext": 0, "trust": 75, "searchName": "portfoliopilot"},
+{"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Monarch Money is a comprehensive personal finance platform offering budgeting, investment tracking, and financial planning tools with a focus on net worth optimization. The company recently launched AI-powered expense categorization and enhanced goal-setting features with automated savings recommendations.", "fundingUpdated": "$55M Series B", "usersUpdated": "300K users", "fundingDelta": "+$35M Series B", "usersDelta": "+150K users", "aiScore": 68, "aiScoreDelta": "+12", "sentiment": 85, "aiDepth": 62, "orchestration": 65, "indiaContext": 0, "trust": 90, "searchName": "monarch money"},
+{"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting", "grade": "C", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "Copilot Money is a personal finance app focused on expense tracking and budgeting with clean interface design and automated categorization. The app recently introduced enhanced subscription tracking features and launched a web version alongside improved spending insights and alerts.", "fundingUpdated": "$6M Seed", "usersUpdated": "100K users", "fundingDelta": "+$6M Seed", "usersDelta": "+60K users", "aiScore": 45, "aiScoreDelta": "+8", "sentiment": 78, "aiDepth": 35, "orchestration": 25, "indiaContext": 0, "trust": 85, "searchName": "copilot money"},
+{"id": "conquest", "name": "Conquest Planning", "geo": "Global", "category": "AI Advisory", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Conquest Planning is a financial planning software focused on comprehensive wealth management and retirement planning for advisors and individuals. The platform recently upgraded its Monte Carlo simulation engine and added enhanced tax planning modules for complex scenarios.", "fundingUpdated": "$25M Series B", "usersUpdated": "50K users", "fundingDelta": "+$12M Series B", "usersDelta": "+15K users", "aiScore": 55, "aiScoreDelta": "+5", "sentiment": 65, "aiDepth": 50, "orchestration": 70, "indiaContext": 0, "trust": 75, "searchName": "conquest planning"},
+{"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "Cleo is a UK-based AI chatbot for personal finance that helps users budget, save money, and track spending through conversational interface. The company recently launched Cleo Plus with advanced budgeting features and expanded its cash advance services with improved eligibility algorithms.", "fundingUpdated": "$44M Series B", "usersUpdated": "5M users", "fundingDelta": "+$10M Series B", "usersDelta": "+1M users", "aiScore": 60, "aiScoreDelta": "+7", "sentiment": 72, "aiDepth": 45, "orchestration": 30, "indiaContext": 0, "trust": 70, "searchName": "cleo"},
+{"id": "plum", "name": "Plum", "geo": "Global", "category": "Platform", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "Plum is a European fintech that uses AI to help users save and invest money automatically based on spending patterns and financial behavior. The platform recently launched fractional investing in ETFs and expanded its smart savings algorithm with improved market timing features.", "fundingUpdated": "$35M Series A", "usersUpdated": "1.5M users", "fundingDelta": "+$15M Series A", "usersDelta": "+400K users", "aiScore": 58, "aiScoreDelta": "+8", "sentiment": 74, "aiDepth": 50, "orchestration": 40, "indiaContext": 0, "trust": 80, "searchName": "plum"},
+{"id": "ynab", "name": "YNAB", "geo": "Global", "category": "Budgeting", "grade": "C-", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "YNAB (You Need A Budget) is a popular budgeting app focused on zero-based budgeting methodology and debt payoff strategies. The company recently enhanced its mobile app with improved goal tracking features and launched advanced reporting capabilities with better spending trend analysis.", "fundingUpdated": "Bootstrapped", "usersUpdated": "4M users", "fundingDelta": "", "usersDelta": "+200K users", "aiScore": 25, "aiScoreDelta": "+3", "sentiment": 88, "aiDepth": 20, "orchestration": 15, "indiaContext": 0, "trust": 95, "searchName": "ynab"},
+{"id": "range", "name": "Range", "geo": "Global", "category": "AI Advisory", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Range is a personal finance platform that helps users track net worth and plan for financial goals. The company recently expanded its investment tracking capabilities with better crypto and alternative asset monitoring.", "fundingUpdated": "$12M Series A", "usersUpdated": "150K users", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 70, "aiDepth": 35, "orchestration": 40, "indiaContext": 5, "trust": 85, "searchName": "range"},
+{"id": "rocketmoney", "name": "Rocket Money", "geo": "Global", "category": "Budgeting", "grade": "C", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "Rocket Money (formerly Truebill) is a subscription management and budgeting app that helps users cancel unwanted subscriptions. They recently launched AI-powered spending insights and enhanced bill negotiation services.", "fundingUpdated": "$50M Series B", "usersUpdated": "3.4M users", "fundingDelta": "", "usersDelta": "+800K users", "aiScore": 55, "aiScoreDelta": "+10", "sentiment": 75, "aiDepth": 45, "orchestration": 25, "indiaContext": 0, "trust": 70, "searchName": "rocket money"},
+{"id": "robinhood", "name": "Robinhood Gold", "geo": "Global", "category": "Platform", "grade": "C-", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "Robinhood Gold is the premium tier of the commission-free trading platform offering margin trading and advanced analytics. They recently launched retirement accounts and expanded crypto trading to include more altcoins.", "fundingUpdated": "$5.2B Total", "usersUpdated": "23M users", "fundingDelta": "", "usersDelta": "", "aiScore": 50, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 30, "orchestration": 20, "indiaContext": 0, "trust": 40, "searchName": "robinhood gold"},
+{"id": "schwab", "name": "Schwab Intelligent", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Schwab Intelligent Portfolios is a robo-advisor offering automated portfolio management with no advisory fees. They recently enhanced their tax-loss harvesting algorithms and integrated ESG investing options.", "fundingUpdated": "Public Company", "usersUpdated": "34M total accounts", "fundingDelta": "", "usersDelta": "", "aiScore": 70, "aiScoreDelta": "+5", "sentiment": 85, "aiDepth": 65, "orchestration": 60, "indiaContext": 0, "trust": 95, "searchName": "schwab intelligent"},
+{"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory", "grade": "B+", "gradeColor": "#30d158", "threat": "medium", "threatColor": "#ff9f0a", "description": "Empower (formerly Personal Capital) combines wealth management with free financial tools for net worth tracking and retirement planning. They recently launched AI-driven cash flow forecasting and enhanced their fee analyzer tool.", "fundingUpdated": "$1B+ AUM focused", "usersUpdated": "3M users", "fundingDelta": "", "usersDelta": "", "aiScore": 75, "aiScoreDelta": "+8", "sentiment": 80, "aiDepth": 70, "orchestration": 75, "indiaContext": 0, "trust": 90, "searchName": "empower"},
+{"id": "wally", "name": "Wally", "geo": "Global", "category": "Budgeting", "grade": "D", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "Wally is a personal finance app focused on expense tracking and budgeting with AI-powered categorization. The app recently shut down its operations and discontinued services as of late 2023.", "fundingUpdated": "$4.5M Total", "usersUpdated": "0 users", "fundingDelta": "", "usersDelta": "-2M users", "aiScore": 0, "aiScoreDelta": "-40", "sentiment": 10, "aiDepth": 0, "orchestration": 0, "indiaContext": 0, "trust": 0, "searchName": "wally"},
+{"id": "acorns", "name": "Acorns", "geo": "Global", "category": "Platform", "grade": "C", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "Acorns is a micro-investing app that rounds up purchases and invests spare change in diversified portfolios. They recently launched Acorns Later retirement accounts and expanded their educational content with AI-personalized financial lessons.", "fundingUpdated": "$207M Total", "usersUpdated": "4.5M users", "fundingDelta": "", "usersDelta": "", "aiScore": 40, "aiScoreDelta": "+5", "sentiment": 70, "aiDepth": 25, "orchestration": 30, "indiaContext": 0, "trust": 75, "searchName": "acorns"},
+{"id": "arta", "name": "Arta Finance", "geo": "Global", "category": "AI-Native", "grade": "A", "gradeColor": "#30d158", "threat": "high", "threatColor": "#ff453a", "description": "Arta Finance is a digital wealth platform targeting high-net-worth individuals with alternative investments and family office services. They recently launched AI-powered portfolio construction and expanded access to private market investments.", "fundingUpdated": "$73M Series A", "usersUpdated": "25K users", "fundingDelta": "+$73M Series A", "usersDelta": "", "aiScore": 85, "aiScoreDelta": "+15", "sentiment": 85, "aiDepth": 80, "orchestration": 85, "indiaContext": 0, "trust": 85, "searchName": "arta finance"},
+{"id": "stashaway", "name": "StashAway", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "StashAway is a digital wealth manager operating across Southeast Asia with algorithm-driven portfolio management. They recently launched StashAway Simple for goal-based investing and expanded their thematic investing options.", "fundingUpdated": "$62M Series C", "usersUpdated": "400K users", "fundingDelta": "", "usersDelta": "+100K users", "aiScore": 70, "aiScoreDelta": "", "sentiment": 80, "aiDepth": 60, "orchestration": 65, "indiaContext": 15, "trust": 90, "searchName": "stashaway"},
+{"id": "syfe", "name": "Syfe", "geo": "Global", "category": "Robo-advisor", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "Syfe is a Singapore-based robo-advisor offering diversified portfolios and goal-based investing across Asia. They recently launched Syfe Cash+ high-yield savings and expanded their equity100 portfolio with AI-enhanced rebalancing.", "fundingUpdated": "$27M Series A", "usersUpdated": "200K users", "fundingDelta": "", "usersDelta": "", "aiScore": 65, "aiScoreDelta": "+8", "sentiment": 75, "aiDepth": 55, "orchestration": 60, "indiaContext": 10, "trust": 85, "searchName": "syfe"},
+{"id": "endowus", "name": "Endowus", "geo": "Global", "category": "Platform", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Singapore-based digital wealth manager offering fee-only investment advisory services across Asia. Recently expanded into Hong Kong with enhanced ESG portfolio options and multi-currency wealth planning.", "fundingUpdated": "$58.5M Series B", "usersUpdated": "150K users", "fundingDelta": "+$35M Series B", "usersDelta": "+75K users", "aiScore": 72, "aiScoreDelta": "+8", "sentiment": 85, "aiDepth": 68, "orchestration": 65, "indiaContext": 15, "trust": 88, "searchName": "endowus"},
+{"id": "magnifi", "name": "Magnifi", "geo": "Global", "category": "AI-Native", "grade": "C", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "AI-powered investment research platform providing personalized portfolio recommendations and market insights. Recently integrated ChatGPT-style natural language queries for investment research with enhanced sector analysis.", "fundingUpdated": "$18M Series A", "usersUpdated": "85K users", "fundingDelta": "+$12M Series A", "usersDelta": "+40K users", "aiScore": 78, "aiScoreDelta": "+12", "sentiment": 82, "aiDepth": 75, "orchestration": 58, "indiaContext": 8, "trust": 75, "searchName": "magnifi"},
+{"id": "moneylion", "name": "MoneyLion", "geo": "Global", "category": "Platform", "grade": "C-", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "US-based neobank offering personal loans, credit monitoring, and robo-advisory services with AI-driven financial coaching. Recently launched RoarMoney Plus with enhanced cashback rewards and integrated cryptocurrency trading features.", "fundingUpdated": "$42M debt facility", "usersUpdated": "4.5M users", "fundingDelta": "+$42M debt", "usersDelta": "+800K users", "aiScore": 65, "aiScoreDelta": "+3", "sentiment": 78, "aiDepth": 55, "orchestration": 62, "indiaContext": 5, "trust": 68, "searchName": "moneylion"},
+{"id": "bambu", "name": "Bambu", "geo": "Global", "category": "AI Advisory", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "B2B robo-advisor platform providing white-label wealth management solutions for financial institutions across Asia. Recently partnered with major Southeast Asian banks to deploy AI-driven ESG investment strategies.", "fundingUpdated": "$7.5M Series A", "usersUpdated": "500K users", "fundingDelta": "+$4M Series A", "usersDelta": "+200K users", "aiScore": 70, "aiScoreDelta": "+6", "sentiment": 80, "aiDepth": 65, "orchestration": 72, "indiaContext": 25, "trust": 82, "searchName": "bambu"},
+{"id": "savvy", "name": "Savvy Wealth", "geo": "Global", "category": "AI-Native", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "Australian wealth management platform offering personalized investment advice and portfolio management with behavioral finance insights. Recently introduced tax-loss harvesting automation and enhanced superannuation optimization tools.", "fundingUpdated": "$12M Series A", "usersUpdated": "45K users", "fundingDelta": "+$8M Series A", "usersDelta": "+25K users", "aiScore": 68, "aiScoreDelta": "+5", "sentiment": 76, "aiDepth": 62, "orchestration": 58, "indiaContext": 12, "trust": 85, "searchName": "savvy wealth"},
+{"id": "scalable", "name": "Scalable Capital", "geo": "Global", "category": "Robo-advisor", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "German digital broker and robo-advisor offering commission-free trading and automated portfolio management across European markets. Recently launched fractional share trading and enhanced AI-driven rebalancing algorithms.", "fundingUpdated": "$180M Series C", "usersUpdated": "600K users", "fundingDelta": "+$65M Series C", "usersDelta": "+150K users", "aiScore": 73, "aiScoreDelta": "+7", "sentiment": 88, "aiDepth": 70, "orchestration": 68, "indiaContext": 8, "trust": 90, "searchName": "scalable capital"},
+{"id": "nutmeg", "name": "Nutmeg", "geo": "Global", "category": "Robo-advisor", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "UK-based digital wealth manager offering ISAs, pensions, and investment portfolios with socially responsible investing options. Recently acquired by JP Morgan and integrated enhanced risk profiling tools with pension contribution optimization.", "fundingUpdated": "$180M acquisition", "usersUpdated": "140K users", "fundingDelta": "", "usersDelta": "+20K users", "aiScore": 66, "aiScoreDelta": "+4", "sentiment": 85, "aiDepth": 58, "orchestration": 65, "indiaContext": 10, "trust": 88, "searchName": "nutmeg"},
+{"id": "addepar", "name": "Addepar", "geo": "Global", "category": "Platform", "grade": "A", "gradeColor": "#30d158", "threat": "high", "threatColor": "#ff453a", "description": "Enterprise wealth management platform serving RIAs and family offices with portfolio analytics and performance reporting. Recently launched Addepar Intelligence with ML-powered insights and enhanced multi-entity tax reporting capabilities.", "fundingUpdated": "$200M Series F", "usersUpdated": "700 enterprise clients", "fundingDelta": "+$50M Series F", "usersDelta": "+100 clients", "aiScore": 82, "aiScoreDelta": "+10", "sentiment": 90, "aiDepth": 85, "orchestration": 88, "indiaContext": 20, "trust": 92, "searchName": "addepar"},
+{"id": "orion", "name": "Orion Advisor", "geo": "Global", "category": "Platform", "grade": "B+", "gradeColor": "#30d158", "threat": "medium", "threatColor": "#ff9f0a", "description": "Comprehensive wealth management technology platform for financial advisors with integrated CRM, trading, and portfolio management. Recently acquired HiddenLevers for stress testing and enhanced their Eclipse platform with AI-driven client insights.", "fundingUpdated": "$125M private equity", "usersUpdated": "2000 advisory firms", "fundingDelta": "", "usersDelta": "+200 firms", "aiScore": 75, "aiScoreDelta": "+8", "sentiment": 87, "aiDepth": 72, "orchestration": 82, "indiaContext": 15, "trust": 90, "searchName": "orion advisor"},
+{"id": "perfios", "name": "Perfios", "geo": "Global", "category": "AI-Native", "grade": "A", "gradeColor": "#30d158", "threat": "high", "threatColor": "#ff453a", "description": "Indian fintech providing bank statement analysis and financial data analytics for lenders and wealth managers. Recently launched PersonalFN integration and enhanced their AI engine with Indian mutual fund performance analytics and tax optimization.", "fundingUpdated": "$229M Series C", "usersUpdated": "900 institutional clients", "fundingDelta": "+$70M Series C", "usersDelta": "+200 clients", "aiScore": 76, "aiScoreDelta": "+9", "sentiment": 85, "aiDepth": 72, "orchestration": 68, "indiaContext": 95, "trust": 85, "searchName": "perfios"}
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+let currentSort = 'threat';
+
+const threatOrder = {'high':0,'medium':1,'watch':2,'low':3};
+const gradeOrder = {'A':0,'B+':1,'B':2,'B-':3,'C+':4,'C':5,'C-':6,'D+':7,'D':8};
+
+function buildCard(c) {
+  const encName = encodeURIComponent(c.name);
+  const newsUrl = `https://www.google.com/search?q=${encName}+fintech+news+2026`;
+  const fundUrl = `https://www.google.com/search?q=${encName}+funding+investment+2026`;
+  const revUrl = `https://www.google.com/search?q=${encName}+user+reviews+reddit`;
+  const siteUrl = `https://www.google.com/search?q=${encName}+official+site`;
+
+  const fdelta = c.fundingDelta ? `<span class="delta pos">${c.fundingDelta}</span>` : '';
+  const udelta = c.usersDelta ? `<span class="delta pos">${c.usersDelta}</span>` : '';
+  const adelta = c.aiScoreDelta ? `<span class="delta pos">${c.aiScoreDelta}</span>` : '';
+
+  const bars = [
+    ['AI Depth', c.aiDepth, '#af52de'],
+    ['Orchestrate', c.orchestration, '#007aff'],
+    ['India Ctx', c.indiaContext, '#ff9f0a'],
+    ['Trust', c.trust, '#30d158'],
+    ['Sentiment', c.sentiment, '#ff453a'],
+  ].map(([label, val, color]) => `
+    <div class="bar-row">
+      <span class="bar-label">${label}</span>
+      <div class="bar-track"><div class="bar-fill" data-width="${val}" style="background:${color};width:0%"></div></div>
+      <span class="bar-val">${val}</span>
+    </div>`).join('');
+
+  return `<div class="card" data-id="${c.id}" data-geo="${c.geo.toLowerCase()}" data-threat="${c.threat}">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${c.name}</div>
+        <div class="card-cat">${c.category}</div>
+      </div>
+      <div class="badges">
+        <span class="geo-badge">${c.geo}</span>
+        <span class="badge" style="background:${c.gradeColor}22;color:${c.gradeColor}">${c.grade}</span>
+        <span class="badge" style="background:${c.threatColor}22;color:${c.threatColor}">${c.threat}</span>
+      </div>
+    </div>
+    <div class="desc">${c.description}</div>
+    <div class="radar-bars">${bars}</div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-box-label">Funding</div>
+        <div class="stat-box-val">${c.fundingUpdated}${fdelta}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Users</div>
+        <div class="stat-box-val">${c.usersUpdated}${udelta}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">AI Score</div>
+        <div class="stat-box-val">${c.aiScore}${adelta}</div>
+      </div>
+    </div>
+    <div class="links">
+      <a class="link-btn" href="${newsUrl}" target="_blank">Latest news</a>
+      <a class="link-btn" href="${fundUrl}" target="_blank">Funding</a>
+      <a class="link-btn" href="${revUrl}" target="_blank">Reviews</a>
+      <a class="link-btn" href="${siteUrl}" target="_blank">Website</a>
+    </div>
+  </div>`;
+}
+
+function render() {
+  const india = document.getElementById('india-grid');
+  const global = document.getElementById('global-grid');
+  india.innerHTML = '';
+  global.innerHTML = '';
+
+  let sorted = [...COMPETITORS];
+  if (currentSort === 'threat') sorted.sort((a,b) => (threatOrder[a.threat]||9)-(threatOrder[b.threat]||9));
+  else if (currentSort === 'grade') sorted.sort((a,b) => (gradeOrder[a.grade]||9)-(gradeOrder[b.grade]||9));
+  else if (currentSort === 'aiDepth') sorted.sort((a,b) => b.aiDepth-a.aiDepth);
+  else if (currentSort === 'name') sorted.sort((a,b) => a.name.localeCompare(b.name));
+
+  let indiaVisible = 0, globalVisible = 0;
+
+  sorted.forEach(c => {
+    const geoMatch = currentFilter === 'all' ||
+      (currentFilter === 'india' && c.geo === 'India') ||
+      (currentFilter === 'global' && c.geo === 'Global') ||
+      (currentFilter === 'high' && c.threat === 'high') ||
+      (currentFilter === 'watch' && c.threat === 'watch');
+    const searchMatch = !currentSearch || c.searchName.includes(currentSearch) ||
+      c.category.toLowerCase().includes(currentSearch) ||
+      c.geo.toLowerCase().includes(currentSearch);
+
+    if (geoMatch && searchMatch) {
+      if (c.geo === 'India') { india.innerHTML += buildCard(c); indiaVisible++; }
+      else { global.innerHTML += buildCard(c); globalVisible++; }
+    }
+  });
+
+  document.getElementById('india-divider').style.display = indiaVisible ? '' : 'none';
+  document.getElementById('global-divider').style.display = globalVisible ? '' : 'none';
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.width + '%';
+    });
+  }, 100);
+}
+
+function filter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  render();
+}
+
+function search(val) {
+  currentSearch = val.toLowerCase();
+  render();
+}
+
+function sort(val) {
+  currentSort = val;
+  render();
+}
+
+render();
+</script>
 </body>
 </html>
