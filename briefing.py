@@ -22,8 +22,9 @@ GITHUB_REPO = "santoshmaruwada/bharosa-briefing"
 RADAR_URL = "https://santoshmaruwada.github.io/bharosa-briefing/radar.html"
 COVERAGE_LOG = "coverage_log.json"
 
-# --- COMPETITOR LIST ---
+# --- COMPETITOR LIST --- 30 total: 20 India + 10 Global ---
 COMPETITORS = [
+    # India (20) — full coverage, primary market
     {"id": "groww", "name": "Groww", "geo": "India", "category": "Platform"},
     {"id": "kuvera", "name": "Kuvera / CRED", "geo": "India", "category": "Platform"},
     {"id": "indmoney", "name": "INDmoney", "geo": "India", "category": "AI Advisory"},
@@ -44,36 +45,17 @@ COMPETITORS = [
     {"id": "finity", "name": "Finity", "geo": "India", "category": "Platform"},
     {"id": "plnr", "name": "PLNR", "geo": "India", "category": "AI-Native"},
     {"id": "mprofit", "name": "mProfit", "geo": "India", "category": "Platform"},
+    # Global (10) — highest strategic relevance to Bharosa
     {"id": "origin", "name": "Origin Financial", "geo": "Global", "category": "AI Advisory"},
+    {"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting"},
+    {"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting"},
     {"id": "wealthfront", "name": "Wealthfront", "geo": "Global", "category": "Robo-advisor"},
     {"id": "betterment", "name": "Betterment", "geo": "Global", "category": "Robo-advisor"},
     {"id": "portfoliopilot", "name": "PortfolioPilot", "geo": "Global", "category": "AI-Native"},
-    {"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting"},
-    {"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting"},
-    {"id": "conquest", "name": "Conquest Planning", "geo": "Global", "category": "AI Advisory"},
-    {"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native"},
-    {"id": "plum", "name": "Plum", "geo": "Global", "category": "Platform"},
-    {"id": "ynab", "name": "YNAB", "geo": "Global", "category": "Budgeting"},
-    {"id": "range", "name": "Range", "geo": "Global", "category": "AI Advisory"},
-    {"id": "rocketmoney", "name": "Rocket Money", "geo": "Global", "category": "Budgeting"},
-    {"id": "robinhood", "name": "Robinhood Gold", "geo": "Global", "category": "Platform"},
-    {"id": "schwab", "name": "Schwab Intelligent", "geo": "Global", "category": "Robo-advisor"},
-    {"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory"},
-    {"id": "wally", "name": "Wally", "geo": "Global", "category": "Budgeting"},
-    {"id": "acorns", "name": "Acorns", "geo": "Global", "category": "Platform"},
-    {"id": "arta", "name": "Arta Finance", "geo": "Global", "category": "AI-Native"},
-    {"id": "stashaway", "name": "StashAway", "geo": "Global", "category": "Robo-advisor"},
-    {"id": "syfe", "name": "Syfe", "geo": "Global", "category": "Robo-advisor"},
-    {"id": "endowus", "name": "Endowus", "geo": "Global", "category": "Platform"},
-    {"id": "magnifi", "name": "Magnifi", "geo": "Global", "category": "AI-Native"},
-    {"id": "moneylion", "name": "MoneyLion", "geo": "Global", "category": "Platform"},
-    {"id": "bambu", "name": "Bambu", "geo": "Global", "category": "AI Advisory"},
-    {"id": "savvy", "name": "Savvy Wealth", "geo": "Global", "category": "AI-Native"},
-    {"id": "scalable", "name": "Scalable Capital", "geo": "Global", "category": "Robo-advisor"},
-    {"id": "nutmeg", "name": "Nutmeg", "geo": "Global", "category": "Robo-advisor"},
     {"id": "addepar", "name": "Addepar", "geo": "Global", "category": "Platform"},
     {"id": "orion", "name": "Orion Advisor", "geo": "Global", "category": "Platform"},
-    {"id": "perfios", "name": "Perfios", "geo": "Global", "category": "AI-Native"},
+    {"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory"},
+    {"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native"},
 ]
 
 # --- COVERAGE MEMORY ---
@@ -977,24 +959,29 @@ def send_email(html_content):
 
 if __name__ == "__main__":
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    is_monday = datetime.now().weekday() == 0
 
     print("Step 1: Generating daily briefing...")
     briefing_html = generate_briefing(client)
     print("Briefing generated.")
 
-    print("Step 2: Researching 50 competitors via web search...")
-    radar_data = generate_radar_data(client)
-    print("Research complete.")
+    if is_monday:
+        print("Step 2: Monday — researching 30 competitors via web search...")
+        radar_data = generate_radar_data(client)
+        print("Research complete.")
 
-    print("Step 3: Building Radar HTML...")
-    generated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p IST")
-    radar_html = build_radar_html(radar_data, generated_at)
-    print("Radar HTML built.")
+        print("Step 3: Building Radar HTML...")
+        generated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p IST")
+        radar_html = build_radar_html(radar_data, generated_at)
+        print("Radar HTML built.")
 
-    print("Step 4: Pushing Radar to GitHub Pages...")
-    push_radar_to_github(radar_html)
+        print("Step 4: Pushing Radar to GitHub Pages...")
+        push_radar_to_github(radar_html)
+        print("Radar live.")
+    else:
+        print("Step 2: Wed/Fri — skipping Radar refresh (runs Mondays only). Existing Radar stays live.")
 
-    print("Step 5: Sending email...")
+    print("Step 3: Sending email...")
     send_email(briefing_html)
 
     print("All done!")
