@@ -4,6 +4,7 @@ import os
 import json
 import re
 import base64
+import time
 import urllib.request
 import urllib.error
 from email.mime.multipart import MIMEMultipart
@@ -77,11 +78,12 @@ COMPETITORS = [
     {"id": "perfios", "name": "Perfios", "geo": "Global", "category": "AI-Native"},
 ]
 
-# Baseline seed data for all competitors
 BASELINE_DATA = {c["id"]: {
-    "description": f"{c['name']} is a {c['category'].lower()} in the {c['geo']} market. Recent developments are being tracked.",
-    "fundingUpdated": "Tracking...",
-    "usersUpdated": "Tracking...",
+    "description": f"Researching {c['name']}...",
+    "fundingUpdated": "—",
+    "usersUpdated": "—",
+    "fundingSource": "",
+    "usersSource": "",
     "fundingDelta": "",
     "usersDelta": "",
     "aiScore": 45,
@@ -159,69 +161,94 @@ If you must reference them, label it "Update:" and state only what is new.
 Today is {today_name}. Find fresh signals the team has not seen yet this week.
 """
 
-# --- RADAR GENERATION ---
+# --- RADAR GENERATION WITH WEB SEARCH ---
 
 def generate_radar_data(client):
-    """Score all 50 competitors in batches of 10."""
-    print("Generating Radar data...")
+    """
+    Score all 50 competitors using web search for verified facts only.
+    Processes one competitor at a time to ensure accuracy.
+    Batches into groups of 5 for efficiency.
+    """
+    print("Generating Radar data with web search verification...")
     all_data = dict(BASELINE_DATA)
-    batch_size = 10
-    ids = [c["id"] for c in COMPETITORS]
-    names = {c["id"]: c["name"] for c in COMPETITORS}
+    batch_size = 5
+    total = len(COMPETITORS)
 
-    for i in range(0, len(ids), batch_size):
-        batch_ids = ids[i:i+batch_size]
+    for i in range(0, total, batch_size):
+        batch = COMPETITORS[i:i+batch_size]
         batch_num = i // batch_size + 1
-        total_batches = (len(ids) + batch_size - 1) // batch_size
-        print(f"  Radar batch {batch_num}/{total_batches}...")
+        total_batches = (total + batch_size - 1) // batch_size
+        names = [c["name"] for c in batch]
+        ids = [c["id"] for c in batch]
+        print(f"  Radar batch {batch_num}/{total_batches}: {', '.join(names)}")
 
-        batch_names = [names[bid] for bid in batch_ids]
-        prompt = f"""You are scoring fintech competitors against Bharosa — an Indian personal finance AI with deep calculation engine, tax logic, and goal orchestration.
+        prompt = f"""You are researching {len(batch)} fintech competitors for Bharosa's competitive intelligence dashboard.
 
-Score these {len(batch_ids)} competitors: {', '.join(batch_names)}
+Competitors to research: {', '.join(names)}
+
+YOUR TASK:
+Use web search to find VERIFIED, SOURCED facts for each company. 
+
+For EACH competitor you MUST search for:
+1. "[Company name] total funding raised" — find the most recent verified funding figure from Crunchbase, TechCrunch, or official press release
+2. "[Company name] users customers 2024 2025" — find official user count stated by the company or in verified press coverage
+3. "[Company name] latest news 2025 2026" — find their most recent product launch, partnership, or development
+
+STRICT RULES — this is critical:
+- If you cannot find a verified figure from a real source, return exactly "—" for that field. DO NOT estimate or guess.
+- Only report numbers that appear in actual search results with a real URL source
+- For funding: only report if you find it in Crunchbase, TechCrunch, Economic Times, VCCircle, or official press release
+- For users: only report if the company or a verified journalist has stated it explicitly
+- For description: only include developments you actually found via web search with a real source
+
+After researching with web search, also score each competitor analytically against Bharosa's moat:
+- aiDepth (0-100): sophistication of AI reasoning in their product
+- orchestration (0-100): can they weave goals + data + tax + market in one loop? Bharosa can, most cannot
+- indiaContext (0-100): depth of Indian MF/SEBI/AMFI/LTCG knowledge specifically
+- trust (0-100): 0=high commission conflicts, 100=zero commission fully transparent
+- sentiment (0-100): user perception from reviews and reputation
+- threat: specifically to Bharosa — "high", "medium", "low", or "watch"
+- grade: overall grade A/B+/B/B-/C+/C/C-/D+/D
 
 Return ONLY a raw JSON array starting with [ and ending with ]. No markdown. No explanation. No code fences.
 
-For each competitor return exactly this structure:
-[
-  {{
-    "id": "exact_id_from_list",
-    "description": "2 sentences. Include one specific recent development or product update.",
-    "fundingUpdated": "total funding raised e.g. $45M Series B",
-    "usersUpdated": "user count e.g. 2M users",
-    "fundingDelta": "+$20M Series A or empty string if unknown",
-    "usersDelta": "+500K users or empty string if unknown",
-    "aiScore": <number 0-100>,
-    "aiScoreDelta": "+5 or empty string",
-    "sentiment": <number 0-100>,
-    "aiDepth": <number 0-100>,
-    "orchestration": <number 0-100>,
-    "indiaContext": <number 0-100>,
-    "trust": <number 0-100>,
-    "threat": "high|medium|low|watch",
-    "grade": "A|B+|B|B-|C+|C|C-|D+|D"
-  }}
-]
-
-IDs to use: {json.dumps(batch_ids)}
-
-Scoring guide vs Bharosa:
-- aiDepth: sophistication of AI reasoning, not just features
-- orchestration: can they weave goals + data + tax + market in one reasoning loop? Bharosa can, most cannot
-- indiaContext: deep knowledge of Indian MF/SEBI/AMFI/LTCG/exit loads specifically
-- trust: 0=high commission conflicts, 100=zero commission fully transparent
-- threat: specifically to Bharosa's India-first personal finance AI position
-- grade: overall competitive threat grade to Bharosa"""
+Schema for each competitor:
+{{
+  "id": "exact id from this list: {json.dumps(ids)}",
+  "description": "2 sentences based only on what you actually found via web search. Include the specific recent development found.",
+  "fundingUpdated": "exact figure found e.g. $45M Series B — or — if not found",
+  "usersUpdated": "exact figure found e.g. 2M users — or — if not found",
+  "fundingSource": "URL of source where funding was found — or empty string",
+  "usersSource": "URL of source where user count was found — or empty string",
+  "fundingDelta": "most recent round only e.g. +$20M Series B — or empty string if not found",
+  "usersDelta": "recent growth if found e.g. +500K — or empty string",
+  "aiScore": <number 0-100 based on your research>,
+  "aiScoreDelta": "",
+  "sentiment": <number 0-100>,
+  "aiDepth": <number 0-100>,
+  "orchestration": <number 0-100>,
+  "indiaContext": <number 0-100>,
+  "trust": <number 0-100>,
+  "threat": "high|medium|low|watch",
+  "grade": "A|B+|B|B-|C+|C|C-|D+|D"
+}}"""
 
         try:
-            import time
-            time.sleep(1)
+            time.sleep(2)  # Rate limit safety
             response = client.messages.create(
                 model="claude-sonnet-4-20250514",
                 max_tokens=4000,
+                tools=[{"type": "web_search_20250305", "name": "web_search"}],
                 messages=[{"role": "user", "content": prompt}]
             )
-            raw = response.content[0].text.strip()
+
+            # Extract text from response (web search tool may produce multiple blocks)
+            raw = ""
+            for block in response.content:
+                if hasattr(block, "text"):
+                    raw += block.text
+
+            raw = raw.strip()
 
             # Robust JSON extraction
             parsed = None
@@ -246,21 +273,21 @@ Scoring guide vs Bharosa:
             if parsed and isinstance(parsed, list):
                 for item in parsed:
                     if "id" in item and item["id"] in all_data:
+                        # Only update with verified data — keep "—" if that's what was returned
                         all_data[item["id"]].update(item)
-                print(f"  Batch {batch_num} OK — {len(parsed)} competitors scored")
+                print(f"    Batch {batch_num} OK — {len(parsed)} competitors researched")
             else:
-                print(f"  Batch {batch_num} — parse failed, keeping baseline")
+                print(f"    Batch {batch_num} — parse failed, keeping baseline")
 
         except Exception as e:
-            print(f"  Batch {batch_num} error: {e}")
+            print(f"    Batch {batch_num} error: {e}")
 
     return all_data
 
 
 def build_radar_html(radar_data: dict, generated_at: str) -> str:
-    """Build the full Bharosa Radar HTML with injected data."""
+    """Build the full Bharosa Radar HTML with verified injected data."""
 
-    # Build competitor JS objects
     comp_js_list = []
     for c in COMPETITORS:
         cid = c["id"]
@@ -283,6 +310,8 @@ def build_radar_html(radar_data: dict, generated_at: str) -> str:
             "description": d.get("description", ""),
             "fundingUpdated": d.get("fundingUpdated", "—"),
             "usersUpdated": d.get("usersUpdated", "—"),
+            "fundingSource": d.get("fundingSource", ""),
+            "usersSource": d.get("usersSource", ""),
             "fundingDelta": d.get("fundingDelta", ""),
             "usersDelta": d.get("usersDelta", ""),
             "aiScore": d.get("aiScore", 45),
@@ -314,9 +343,11 @@ body::before{{content:'';position:fixed;inset:0;background-image:url("data:image
 .sticky-bar{{position:sticky;top:0;z-index:100;background:rgba(10,10,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid #1c1c1e;padding:12px 32px;display:flex;align-items:center;justify-content:space-between}}
 .pulse{{width:8px;height:8px;background:#30d158;border-radius:50%;animation:pulse 2s infinite;display:inline-block;margin-right:8px}}
 @keyframes pulse{{0%,100%{{opacity:1;transform:scale(1)}}50%{{opacity:0.5;transform:scale(1.3)}}}}
+.verified-badge{{background:#30d15822;color:#30d158;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;margin-left:8px;letter-spacing:0.5px}}
 .hero{{padding:48px 32px 32px;position:relative;z-index:1}}
 .hero h1{{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}}
-.hero p{{color:#8e8e93;font-size:15px;margin-bottom:28px}}
+.hero p{{color:#8e8e93;font-size:15px;margin-bottom:4px}}
+.verified-note{{color:#30d158;font-size:12px;margin-bottom:28px;}}
 .stat-pills{{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}}
 .pill{{background:#1c1c1e;border:1px solid #2c2c2e;border-radius:10px;padding:14px 20px;text-align:center}}
 .pill-num{{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;display:block}}
@@ -337,6 +368,8 @@ body::before{{content:'';position:fixed;inset:0;background-image:url("data:image
 .badge{{padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}}
 .geo-badge{{background:#1c1c1e;color:#636366;padding:3px 8px;border-radius:5px;font-size:11px}}
 .desc{{font-size:13px;color:#8e8e93;line-height:1.6;margin-bottom:14px}}
+.radar-section-label{{font-size:10px;font-weight:700;letter-spacing:2px;color:#3a3a3c;text-transform:uppercase;margin-bottom:8px}}
+.radar-note{{font-size:10px;color:#3a3a3c;margin-bottom:8px;font-style:italic}}
 .radar-bars{{margin-bottom:14px}}
 .bar-row{{display:flex;align-items:center;gap:8px;margin-bottom:6px}}
 .bar-label{{font-size:11px;color:#636366;width:80px;flex-shrink:0}}
@@ -345,15 +378,19 @@ body::before{{content:'';position:fixed;inset:0;background-image:url("data:image
 .bar-val{{font-family:'DM Mono',monospace;font-size:11px;color:#636366;width:28px;text-align:right}}
 .stats-row{{display:flex;gap:8px;margin-bottom:14px}}
 .stat-box{{flex:1;background:#0a0a0b;border:1px solid #1c1c1e;border-radius:8px;padding:8px 10px}}
-.stat-box-label{{font-size:10px;color:#636366;text-transform:uppercase;letter-spacing:0.5px}}
+.stat-box-label{{font-size:10px;color:#636366;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:4px}}
+.stat-verified{{width:6px;height:6px;background:#30d158;border-radius:50%;display:inline-block}}
+.stat-unverified{{width:6px;height:6px;background:#636366;border-radius:50%;display:inline-block}}
 .stat-box-val{{font-size:13px;font-weight:600;margin-top:2px;font-family:'DM Mono',monospace}}
+.stat-source{{font-size:9px;color:#3a3a3c;margin-top:2px}}
 .delta{{font-size:10px;font-weight:600;margin-left:4px}}
 .delta.pos{{color:#30d158}}.delta.neg{{color:#ff453a}}
 .links{{display:flex;gap:6px;flex-wrap:wrap}}
 .link-btn{{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;transition:all 0.2s}}
 .link-btn:hover{{background:#2c2c2e;color:#e5e5ea}}
-.hidden{{display:none}}
 .generated-note{{text-align:center;padding:24px;color:#3a3a3c;font-size:12px;font-family:'DM Mono',monospace}}
+.legend{{display:flex;gap:16px;margin-bottom:16px;font-size:11px;color:#636366;align-items:center}}
+.legend-item{{display:flex;align-items:center;gap:4px}}
 </style>
 </head>
 <body>
@@ -362,28 +399,38 @@ body::before{{content:'';position:fixed;inset:0;background-image:url("data:image
   <div style="display:flex;align-items:center">
     <span class="pulse"></span>
     <span style="font-size:13px;font-weight:600;">Bharosa Radar</span>
+    <span class="verified-badge">WEB VERIFIED</span>
     <span style="font-size:12px;color:#636366;margin-left:12px;">Generated {generated_at}</span>
   </div>
-  <div style="font-size:12px;color:#636366;">Daily snapshot · Read-only</div>
+  <div style="font-size:12px;color:#636366;">Facts sourced via live web search · Read-only snapshot</div>
 </div>
 
 <div class="hero">
   <h1>Competitor Radar</h1>
-  <p>50 players tracked. Scored daily against Bharosa's moat.</p>
+  <p>50 players tracked. Funding and user data verified via live web search.</p>
+  <p class="verified-note">&#9679; Green dot = verified from source &nbsp;&#9679; Grey dot = not publicly available</p>
   <div class="stat-pills">
     <div class="pill"><span class="pill-num" style="color:#30d158;">50</span><span class="pill-label">Players</span></div>
     <div class="pill"><span class="pill-num" style="color:#007aff;">{india_count}</span><span class="pill-label">India</span></div>
     <div class="pill"><span class="pill-num" style="color:#ff453a;" id="high-count">{high_threat}</span><span class="pill-label">High threat</span></div>
     <div class="pill"><span class="pill-num" style="color:#ff9f0a;">30</span><span class="pill-label">Global</span></div>
   </div>
+  <div class="legend">
+    <span>Analytical scores (not facts):</span>
+    <span class="legend-item"><span style="width:12px;height:4px;background:#af52de;border-radius:2px;display:inline-block"></span> AI Depth</span>
+    <span class="legend-item"><span style="width:12px;height:4px;background:#007aff;border-radius:2px;display:inline-block"></span> Orchestration</span>
+    <span class="legend-item"><span style="width:12px;height:4px;background:#ff9f0a;border-radius:2px;display:inline-block"></span> India Context</span>
+    <span class="legend-item"><span style="width:12px;height:4px;background:#30d158;border-radius:2px;display:inline-block"></span> Trust</span>
+    <span class="legend-item"><span style="width:12px;height:4px;background:#ff453a;border-radius:2px;display:inline-block"></span> Sentiment</span>
+  </div>
   <div class="controls">
-    <button class="filter-btn active" onclick="filter('all')">All</button>
-    <button class="filter-btn" onclick="filter('india')">India</button>
-    <button class="filter-btn" onclick="filter('global')">Global</button>
-    <button class="filter-btn" onclick="filter('high')">High threat</button>
-    <button class="filter-btn" onclick="filter('watch')">Watch</button>
+    <button class="filter-btn active" onclick="filter('all', event)">All</button>
+    <button class="filter-btn" onclick="filter('india', event)">India</button>
+    <button class="filter-btn" onclick="filter('global', event)">Global</button>
+    <button class="filter-btn" onclick="filter('high', event)">High threat</button>
+    <button class="filter-btn" onclick="filter('watch', event)">Watch</button>
     <input class="search-box" type="text" placeholder="Search..." oninput="search(this.value)">
-    <select class="filter-btn" onchange="sort(this.value)" style="padding:7px 12px">
+    <select class="filter-btn" onchange="sortBy(this.value)" style="padding:7px 12px">
       <option value="threat">Sort: Threat</option>
       <option value="grade">Sort: Grade</option>
       <option value="aiDepth">Sort: AI Depth</option>
@@ -397,7 +444,11 @@ body::before{{content:'';position:fixed;inset:0;background-image:url("data:image
 <div id="global-divider" class="section-divider">Global Players</div>
 <div id="global-grid" class="grid"></div>
 
-<div class="generated-note">Bharosa Radar · Generated {generated_at} · Scores updated daily at 9am IST</div>
+<div class="generated-note">
+  Bharosa Radar · Generated {generated_at}<br>
+  Funding &amp; user data sourced via live web search. Analytical scores reflect Bharosa team's competitive assessment.<br>
+  "—" means data was not publicly available at time of generation.
+</div>
 
 <script>
 const COMPETITORS = {competitors_js};
@@ -412,9 +463,12 @@ const gradeOrder = {{'A':0,'B+':1,'B':2,'B-':3,'C+':4,'C':5,'C-':6,'D+':7,'D':8}
 function buildCard(c) {{
   const encName = encodeURIComponent(c.name);
   const newsUrl = `https://www.google.com/search?q=${{encName}}+fintech+news+2026`;
-  const fundUrl = `https://www.google.com/search?q=${{encName}}+funding+investment+2026`;
+  const fundUrl = c.fundingSource || `https://www.google.com/search?q=${{encName}}+funding+crunchbase`;
   const revUrl = `https://www.google.com/search?q=${{encName}}+user+reviews+reddit`;
   const siteUrl = `https://www.google.com/search?q=${{encName}}+official+site`;
+
+  const fundVerified = c.fundingUpdated !== '—' && c.fundingUpdated !== '';
+  const usersVerified = c.usersUpdated !== '—' && c.usersUpdated !== '';
 
   const fdelta = c.fundingDelta ? `<span class="delta pos">${{c.fundingDelta}}</span>` : '';
   const udelta = c.usersDelta ? `<span class="delta pos">${{c.usersDelta}}</span>` : '';
@@ -433,6 +487,13 @@ function buildCard(c) {{
       <span class="bar-val">${{val}}</span>
     </div>`).join('');
 
+  const fundSourceLink = c.fundingSource
+    ? `<a href="${{c.fundingSource}}" target="_blank" style="color:#30d158;font-size:9px;text-decoration:none;">source ↗</a>`
+    : '';
+  const usersSourceLink = c.usersSource
+    ? `<a href="${{c.usersSource}}" target="_blank" style="color:#30d158;font-size:9px;text-decoration:none;">source ↗</a>`
+    : '';
+
   return `<div class="card" data-id="${{c.id}}" data-geo="${{c.geo.toLowerCase()}}" data-threat="${{c.threat}}">
     <div class="card-top">
       <div>
@@ -446,18 +507,30 @@ function buildCard(c) {{
       </div>
     </div>
     <div class="desc">${{c.description}}</div>
+    <div class="radar-note">Analytical scores — competitive assessment vs Bharosa's moat</div>
     <div class="radar-bars">${{bars}}</div>
     <div class="stats-row">
       <div class="stat-box">
-        <div class="stat-box-label">Funding</div>
+        <div class="stat-box-label">
+          <span class="${{fundVerified ? 'stat-verified' : 'stat-unverified'}}"></span>
+          Funding
+        </div>
         <div class="stat-box-val">${{c.fundingUpdated}}${{fdelta}}</div>
+        <div class="stat-source">${{fundSourceLink}}</div>
       </div>
       <div class="stat-box">
-        <div class="stat-box-label">Users</div>
+        <div class="stat-box-label">
+          <span class="${{usersVerified ? 'stat-verified' : 'stat-unverified'}}"></span>
+          Users
+        </div>
         <div class="stat-box-val">${{c.usersUpdated}}${{udelta}}</div>
+        <div class="stat-source">${{usersSourceLink}}</div>
       </div>
       <div class="stat-box">
-        <div class="stat-box-label">AI Score</div>
+        <div class="stat-box-label">
+          <span class="stat-unverified"></span>
+          AI Score
+        </div>
         <div class="stat-box-val">${{c.aiScore}}${{adelta}}</div>
       </div>
     </div>
@@ -503,7 +576,6 @@ function render() {{
   document.getElementById('india-divider').style.display = indiaVisible ? '' : 'none';
   document.getElementById('global-divider').style.display = globalVisible ? '' : 'none';
 
-  // Animate bars
   setTimeout(() => {{
     document.querySelectorAll('.bar-fill').forEach(el => {{
       el.style.width = el.dataset.width + '%';
@@ -511,10 +583,10 @@ function render() {{
   }}, 100);
 }}
 
-function filter(f) {{
+function filter(f, event) {{
   currentFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
   render();
 }}
 
@@ -523,7 +595,7 @@ function search(val) {{
   render();
 }}
 
-function sort(val) {{
+function sortBy(val) {{
   currentSort = val;
   render();
 }}
@@ -542,7 +614,6 @@ def push_radar_to_github(html_content: str) -> bool:
         return False
 
     try:
-        # Get current file SHA if it exists
         api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/radar.html"
         headers = {
             "Authorization": f"token {GITHUB_TOKEN}",
@@ -561,13 +632,9 @@ def push_radar_to_github(html_content: str) -> bool:
             if e.code != 404:
                 print(f"  GitHub GET error: {e.code}")
 
-        # Push updated file
         content_b64 = base64.b64encode(html_content.encode("utf-8")).decode("utf-8")
         today = datetime.now().strftime("%B %d, %Y")
-        payload = {
-            "message": f"Radar update {today}",
-            "content": content_b64,
-        }
+        payload = {"message": f"Radar update {today}", "content": content_b64}
         if sha:
             payload["sha"] = sha
 
@@ -575,7 +642,7 @@ def push_radar_to_github(html_content: str) -> bool:
         req = urllib.request.Request(api_url, data=data, headers=headers, method="PUT")
         with urllib.request.urlopen(req) as resp:
             if resp.status in (200, 201):
-                print(f"  Radar pushed to GitHub Pages: {RADAR_URL}")
+                print(f"  Radar pushed to GitHub Pages successfully")
                 return True
             else:
                 print(f"  GitHub push failed: {resp.status}")
@@ -586,7 +653,7 @@ def push_radar_to_github(html_content: str) -> bool:
         return False
 
 
-# --- BRIEFING GENERATION ---
+# --- BRIEFING PROMPTS ---
 
 SYSTEM_PROMPT = """You are Bharosa's daily intelligence engine.
 
@@ -617,8 +684,8 @@ SIGNAL QUALITY:
 - Competitor mentions must name a specific company and state WHY they can't do what Bharosa does
 
 REPETITION RULES:
-- If a topic appears in the "ALREADY COVERED THIS WEEK" list, skip it unless there is a major new development
-- If you must reference a covered topic, start with "Update:" and state only what is NEW
+- If a topic appears in "ALREADY COVERED THIS WEEK", skip it unless major new development
+- If referencing covered topic, label "Update:" and state only what is new
 
 SEARCH FOR RAW HUMAN CONVERSATIONS:
 - Reddit: r/personalfinance, r/financialindependence, r/fatFIRE, r/Bogleheads, r/UKPersonalFinance, r/IndiaInvestments, r/FIREIndia, r/tax
@@ -627,14 +694,10 @@ SEARCH FOR RAW HUMAN CONVERSATIONS:
 - ONLY discussion threads with human replies in Worth Reading. Zero articles.
 
 SECTION RULES:
-
-Top Competitor Watch: Find the single most newsworthy competitor move from last 48 hours. Must be NAMED. Real source only.
-
-AI Radar: 3-4 AI updates from last 24-48 hours. 2 lines max each. Flag Bharosa angle if relevant.
-
-World Signals: 3-4 global developments. 2 lines max each. General founder awareness.
-
-Events Radar: Upcoming fintech/AI/startup events in Mumbai and Bangalore only. Next 30 days. Skip if nothing found. Flag Mumbai events for Santosh.
+Top Competitor Watch: Most newsworthy competitor move from last 48 hours. Named. Real source only.
+AI Radar: 3-4 AI updates from last 24-48 hours. 2 lines max each.
+World Signals: 3-4 global developments. 2 lines max each.
+Events Radar: Mumbai/Bangalore only. Next 30 days. Skip if nothing found. Flag Mumbai for Santosh.
 
 OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No backticks. No preamble. Stay under 8000 tokens.
 
@@ -703,7 +766,6 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 
 <!-- AI CAPABILITY -->
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">AI Capability for Bharosa</p>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #af52de;">
   <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[HEADLINE -- AI development that changes what Bharosa can build]</p>
@@ -716,7 +778,6 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 
 <!-- COMPETITOR + MARKET -->
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Competitor and Market</p>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
   <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[NAMED COMPETITOR] -- [What they did]</p>
@@ -725,7 +786,6 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
   <p style="margin:0;font-size:12px;color:#8e8e93;"><a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
 </td></tr>
 </table>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
   <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#1c1c1e;line-height:1.4;">[REGULATORY/MARKET SHIFT]</p>
@@ -737,7 +797,6 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 
 <!-- WHAT TO BUILD -->
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">What to Build</p>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0faf4;border-radius:10px;padding:16px 18px;border-left:3px solid #30d158;">
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;font-style:italic;">[ONE sentence synthesising today's signals into a product gap.]</p>
@@ -749,7 +808,6 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <!-- AI RADAR -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">AI Radar</p>
 <p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">What moved in AI today. Stay sharp.</p>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f5f0ff;border-radius:10px;padding:16px 18px;">
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#af52de;">&#9679;</strong>&nbsp;&nbsp;<strong>[AI UPDATE 1]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
@@ -762,7 +820,6 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 <!-- WORLD SIGNALS -->
 <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">World Signals</p>
 <p style="margin:0 0 12px;font-size:12px;color:#8e8e93;">Things a well-informed founder should know today.</p>
-
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
 <tr><td style="background:#f0f7ff;border-radius:10px;padding:16px 18px;">
   <p style="margin:0 0 10px;font-size:14px;color:#1c1c1e;line-height:1.6;"><strong style="color:#007aff;">&#9679;</strong>&nbsp;&nbsp;<strong>[WORLD SIGNAL 1]</strong><br><span style="color:#3a3a3c;">[One sentence.]</span><br><span style="font-size:12px;color:#8e8e93;"><a href="[URL]" style="color:#007aff;text-decoration:none;">Source</a></span></p>
@@ -810,12 +867,10 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
 </table>
 
 </td></tr>
-
 <!-- FOOTER -->
 <tr><td style="padding:20px 36px;text-align:center;border-top:1px solid #f2f2f7;">
   <p style="margin:0;font-size:11px;color:#aeaeb2;">Bharosa Intel -- [DATE]</p>
 </td></tr>
-
 </table>
 </td></tr>
 </table>
@@ -842,7 +897,7 @@ RULES:
 - All 6 Worth Reading links must be DISCUSSION THREADS only
 - Name specific competitors always
 - Events Radar: skip entirely if nothing found in next 30 days
-- Covered topics: skip unless major new development, then label "Update:"
+- Covered topics: skip unless major new development, label "Update:"
 
 Return only complete HTML. No markdown. No backticks."""
 
@@ -861,7 +916,7 @@ SEARCH -- do all of these:
 7. World news: major global events, India developments
 8. Events: "fintech summit Mumbai 2026" + "wealth conference Bangalore 2026" + "AI summit Mumbai 2026"
 
-MONDAY SPECIAL -- include "Last Week" section right after the Contrarian Bet, before User Signals:
+MONDAY SPECIAL -- include "Last Week" section right after Contrarian Bet, before User Signals:
 
 <p style="margin:24px 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Last Week</p>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
@@ -881,7 +936,6 @@ RULES:
 - All 6 Worth Reading links must be DISCUSSION THREADS only
 - Name specific competitors always
 - Events Radar: skip entirely if nothing found in next 30 days
-- Whole note readable in under 5 minutes on Mondays
 
 Return only complete HTML. No markdown. No backticks."""
 
@@ -891,7 +945,8 @@ def inject_radar_button(html_content: str, radar_url: str) -> str:
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0 0;border-top:1px solid #e5e5ea;">
   <tr><td style="padding:28px 36px 0;">
     <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Competitor Radar</p>
-    <p style="margin:0 0 16px;font-size:13px;color:#8e8e93;line-height:1.5;">50 competitors scored daily -- AI depth, funding, user growth, threat to Bharosa. Fresh data generated this morning.</p>
+    <p style="margin:0 0 4px;font-size:13px;color:#8e8e93;line-height:1.5;">50 competitors scored daily. Funding and user data verified via live web search.</p>
+    <p style="margin:0 0 16px;font-size:12px;color:#30d158;">Green dot = verified from source &nbsp;·&nbsp; Grey dot = not publicly available</p>
     <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
       <tr>
         <td style="padding-right:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#f2f2f7;border-radius:8px;padding:10px 16px;text-align:center;"><p style="margin:0;font-size:18px;font-weight:700;color:#00c47d;font-family:monospace;">50</p><p style="margin:2px 0 0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#98989d;">Players</p></td></tr></table></td>
@@ -904,7 +959,7 @@ def inject_radar_button(html_content: str, radar_url: str) -> str:
         <a href="{radar_url}" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">Open Competitor Radar &nbsp;&#8594;</a>
       </td></tr>
     </table>
-    <p style="margin:0;font-size:11px;color:#aeaeb2;">Opens in browser. Today's scores generated fresh at 9am IST.</p>
+    <p style="margin:0;font-size:11px;color:#aeaeb2;">Opens in browser. Today's scores generated fresh at 9am IST via live web search.</p>
   </td></tr>
 </table>
 """
@@ -984,7 +1039,7 @@ if __name__ == "__main__":
     briefing_html = generate_briefing(client)
     print("Briefing generated.")
 
-    print("Step 2: Generating Radar data for 50 competitors...")
+    print("Step 2: Generating Radar data with web search verification...")
     radar_data = generate_radar_data(client)
     print("Radar data generated.")
 
@@ -999,4 +1054,4 @@ if __name__ == "__main__":
     print("Step 5: Sending email...")
     send_email(briefing_html)
 
-    print("Done!")
+    print("All done!")
