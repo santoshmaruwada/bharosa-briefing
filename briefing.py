@@ -22,9 +22,9 @@ GITHUB_REPO = "santoshmaruwada/bharosa-briefing"
 RADAR_URL = "https://santoshmaruwada.github.io/bharosa-briefing/radar.html"
 COVERAGE_LOG = "coverage_log.json"
 
-# --- COMPETITOR LIST --- 30 total: 20 India + 10 Global ---
+# --- COMPETITOR LIST --- 50 total: 20 India + 30 Global ---
 COMPETITORS = [
-    # India (20) — full coverage, primary market
+    # India (20)
     {"id": "groww", "name": "Groww", "geo": "India", "category": "Platform"},
     {"id": "kuvera", "name": "Kuvera / CRED", "geo": "India", "category": "Platform"},
     {"id": "indmoney", "name": "INDmoney", "geo": "India", "category": "AI Advisory"},
@@ -45,17 +45,37 @@ COMPETITORS = [
     {"id": "finity", "name": "Finity", "geo": "India", "category": "Platform"},
     {"id": "plnr", "name": "PLNR", "geo": "India", "category": "AI-Native"},
     {"id": "mprofit", "name": "mProfit", "geo": "India", "category": "Platform"},
-    # Global (10) — highest strategic relevance to Bharosa
+    # Global (30)
     {"id": "origin", "name": "Origin Financial", "geo": "Global", "category": "AI Advisory"},
-    {"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting"},
-    {"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting"},
     {"id": "wealthfront", "name": "Wealthfront", "geo": "Global", "category": "Robo-advisor"},
     {"id": "betterment", "name": "Betterment", "geo": "Global", "category": "Robo-advisor"},
     {"id": "portfoliopilot", "name": "PortfolioPilot", "geo": "Global", "category": "AI-Native"},
+    {"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting"},
+    {"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting"},
+    {"id": "conquest", "name": "Conquest Planning", "geo": "Global", "category": "AI Advisory"},
+    {"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native"},
+    {"id": "plum", "name": "Plum", "geo": "Global", "category": "Platform"},
+    {"id": "ynab", "name": "YNAB", "geo": "Global", "category": "Budgeting"},
+    {"id": "range", "name": "Range", "geo": "Global", "category": "AI Advisory"},
+    {"id": "rocketmoney", "name": "Rocket Money", "geo": "Global", "category": "Budgeting"},
+    {"id": "robinhood", "name": "Robinhood Gold", "geo": "Global", "category": "Platform"},
+    {"id": "schwab", "name": "Schwab Intelligent", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory"},
+    {"id": "wally", "name": "Wally", "geo": "Global", "category": "Budgeting"},
+    {"id": "acorns", "name": "Acorns", "geo": "Global", "category": "Platform"},
+    {"id": "arta", "name": "Arta Finance", "geo": "Global", "category": "AI-Native"},
+    {"id": "stashaway", "name": "StashAway", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "syfe", "name": "Syfe", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "endowus", "name": "Endowus", "geo": "Global", "category": "Platform"},
+    {"id": "magnifi", "name": "Magnifi", "geo": "Global", "category": "AI-Native"},
+    {"id": "moneylion", "name": "MoneyLion", "geo": "Global", "category": "Platform"},
+    {"id": "bambu", "name": "Bambu", "geo": "Global", "category": "AI Advisory"},
+    {"id": "savvy", "name": "Savvy Wealth", "geo": "Global", "category": "AI-Native"},
+    {"id": "scalable", "name": "Scalable Capital", "geo": "Global", "category": "Robo-advisor"},
+    {"id": "nutmeg", "name": "Nutmeg", "geo": "Global", "category": "Robo-advisor"},
     {"id": "addepar", "name": "Addepar", "geo": "Global", "category": "Platform"},
     {"id": "orion", "name": "Orion Advisor", "geo": "Global", "category": "Platform"},
-    {"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory"},
-    {"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native"},
+    {"id": "perfios", "name": "Perfios", "geo": "Global", "category": "AI-Native"},
 ]
 
 # --- COVERAGE MEMORY ---
@@ -650,6 +670,15 @@ SEARCH FOR RAW HUMAN CONVERSATIONS:
 - ONLY discussion threads with human replies in Worth Reading. Zero articles.
 
 SECTION RULES:
+
+Key Highlights (OPTIONAL — only include if genuinely newsworthy signals found):
+- Search for: recent user complaints on Reddit/app stores about named competitors, new product launches, funding announcements, notable feature updates
+- Only include if you find something REAL and SPECIFIC — e.g. "Groww users reporting GR-1 portfolio sync failures on Reddit" or "INDmoney launched tax harvesting feature"
+- Max 4 items. Can be 1. Can be 0 — skip section entirely if nothing worth flagging.
+- Each item must name a specific company, state what happened, and have a real source URL
+- Signal types: PRODUCT LAUNCH (green #30d158), USER BACKLASH (red #ff453a), FUNDING (blue #007aff), FEATURE UPDATE (gold #ff9f0a)
+- DO NOT fill with generic news. Empty is better than weak.
+
 Top Competitor Watch: Most newsworthy competitor move from last 48 hours. Named. Real source only.
 AI Radar: 3-4 AI updates from last 24-48 hours. 2 lines max each.
 World Signals: 3-4 global developments. 2 lines max each.
@@ -686,6 +715,25 @@ OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. No markdown. No back
   <p style="margin:0;font-size:14px;color:#1c1c1e;line-height:1.5;font-weight:600;">[ONE SHARP SENTENCE challenging what most fintech founders believe. Must connect to why Bharosa wins.]</p>
 </td></tr>
 <tr><td style="padding:24px 36px 32px;">
+
+<!-- KEY HIGHLIGHTS — skip this entire section if nothing genuinely newsworthy found -->
+<!-- Only include when: real user complaints found on Reddit/app stores, named competitor launched something, funding announced, notable feature shipped -->
+<!-- Format per item — max 4 items total, can be 0:
+<p style="margin:0 0 12px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">Key Highlights</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+<tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;">
+  [REPEAT THIS BLOCK PER ITEM — omit section entirely if no real signals:]
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+  <tr><td style="border-left:3px solid [#30d158 or #ff453a or #007aff or #ff9f0a];padding-left:12px;">
+    <p style="margin:0 0 3px;font-size:10px;font-weight:700;letter-spacing:1.5px;color:[COLOR];text-transform:uppercase;">[PRODUCT LAUNCH or USER BACKLASH or FUNDING or FEATURE UPDATE]</p>
+    <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#1c1c1e;line-height:1.5;">[COMPANY] -- [What happened. One punchy sentence.]</p>
+    <p style="margin:0;font-size:12px;color:#8e8e93;">[Why it matters for Bharosa.] <a href="[SOURCE_URL]" style="color:#007aff;text-decoration:none;">Source</a></p>
+  </td></tr>
+  </table>
+</td></tr>
+</table>
+-->
+
 <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:3px;color:#98989d;text-transform:uppercase;">User Signals</p>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
 <tr><td style="background:#f9f9fb;border-radius:10px;padding:16px 18px;border-left:3px solid #007aff;">
@@ -806,8 +854,9 @@ USER_MESSAGE = """Generate today's Bharosa intelligence memo. Today is {date}.
 {coverage_context}
 
 SEARCH -- do all of these:
-0. Competitor news first: "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026"
-1. Reddit: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration"
+0. Key Highlights first: Search "Groww complaints reddit 2026" + "INDmoney new feature 2026" + "Zerodha user issues 2026" + "Monarch Money launch 2026" + "Wealthfront update 2026" — find real user complaints, product launches, or funding news from last 7 days. Only flag if genuinely newsworthy.
+1. Competitor news: "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026" + "Wealthfront AI 2026"
+2. Reddit: "reddit personal finance AI tool" + "reddit ESOP tax decision" + "reddit financial planning frustration"
 2. Twitter/X: "AI financial advisor" + "personal finance AI"
 3. Hacker News: "site:news.ycombinator.com personal finance AI"
 4. Regulatory: recent SEBI, SEC, tax changes
@@ -830,8 +879,9 @@ USER_MESSAGE_MONDAY = """Generate today's Bharosa intelligence memo. Today is {d
 {coverage_context}
 
 SEARCH -- do all of these:
-0. Competitor news: "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026"
-1. WEEK IN REVIEW: biggest fintech, AI, India startup stories from last 7 days -- 5 sharp bullets
+0. Key Highlights first: Search "Groww complaints reddit 2026" + "INDmoney new feature 2026" + "Zerodha user issues 2026" + "Monarch Money launch 2026" — find real user complaints, launches, or funding from last 7 days.
+1. Competitor news: "Groww new feature 2026" + "INDmoney launch 2026" + "Monarch Money update 2026"
+2. WEEK IN REVIEW: biggest fintech, AI, India startup stories from last 7 days -- 5 sharp bullets
 2. Reddit: "reddit personal finance AI tool" + "reddit ESOP tax decision"
 3. Twitter/X: "AI financial advisor" + "personal finance AI"
 4. Hacker News: "site:news.ycombinator.com personal finance AI"
@@ -966,7 +1016,7 @@ if __name__ == "__main__":
     print("Briefing generated.")
 
     if is_monday:
-        print("Step 2: Monday — researching 30 competitors via web search...")
+        print("Step 2: Monday — researching 50 competitors via web search...")
         radar_data = generate_radar_data(client)
         print("Research complete.")
 
