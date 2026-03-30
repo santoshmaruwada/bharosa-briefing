@@ -142,155 +142,119 @@ If you must reference them, label it "Update:" and state only what is new.
 Today is {today_name}. Find fresh signals the team has not seen yet this week.
 """
 
-# --- RADAR GENERATION — FACTS ONLY, WEB SEARCH VERIFIED ---
+# --- RADAR GENERATION ---
+# Top 10 India competitors: 1 web search each for latest news
+# All other 40: static cards only, no API call
+
+TOP_10_INDIA = [
+    "groww", "indmoney", "zerodha", "kuvera", "smallcase",
+    "angelone", "etmoney", "upstox", "dhan", "mprofit"
+]
 
 def generate_radar_data(client):
     """
-    Research all 50 competitors using web search.
-    Returns ONLY verified facts. No fallback numbers. No estimates.
-    If a fact cannot be verified, the field is null/empty and won't be shown.
+    Top 10 India competitors: 1 web search each for latest news update.
+    All other 40 competitors: static cards, no API call.
+    Cost: ~$0.15 per run. Time: ~2 minutes.
     """
-    print("Generating Radar — web search verified facts only...")
+    print("Generating Radar — top 10 India with web search, rest static...")
+
     all_data = {c["id"]: {
         "name": c["name"],
         "geo": c["geo"],
         "category": c["category"],
         "description": None,
-        "descriptionSource": None,
         "funding": None,
         "fundingSource": None,
-        "fundingDate": None,
         "users": None,
         "usersSource": None,
         "latestNews": None,
         "latestNewsUrl": None,
         "latestNewsDate": None,
         "website": None,
+        "searched": False,
     } for c in COMPETITORS}
 
-    batch_size = 5
-    total = len(COMPETITORS)
+    # Only research top 10 India competitors
+    to_research = [c for c in COMPETITORS if c["id"] in TOP_10_INDIA]
 
-    for i in range(0, total, batch_size):
-        batch = COMPETITORS[i:i+batch_size]
-        batch_num = i // batch_size + 1
-        total_batches = (total + batch_size - 1) // batch_size
-        names = [c["name"] for c in batch]
-        ids = [c["id"] for c in batch]
-        print(f"  Batch {batch_num}/{total_batches}: {', '.join(names)}")
+    for c in to_research:
+        cid = c["id"]
+        print(f"  Researching {c['name']}...")
+        try:
+            time.sleep(1)
+            prompt = f"""Search for the latest news and key facts about {c['name']}, an Indian fintech company.
 
-        prompt = f"""You are a fact-checker for Bharosa's competitor intelligence dashboard.
+Search for:
+1. "{c['name']} latest news 2026"
+2. "{c['name']} funding users"
 
-Research these {len(batch)} companies using web search: {', '.join(names)}
+Return ONLY a raw JSON object starting with {{ and ending with }}. No markdown. No explanation.
 
-STRICT RULES — read carefully:
-1. Use web search to find information. Search multiple times per company if needed.
-2. ONLY include data you actually found from a real URL source in your search results.
-3. If you cannot find a verified figure — return null for that field. Never estimate or guess.
-4. For funding: search "[company] funding raised total" and "[company] crunchbase" and "[company] series funding". Only report if you find it in Crunchbase, TechCrunch, Economic Times, VCCircle, Mint, or an official press release.
-5. For users: search "[company] users customers million 2024 2025". Only report if a company executive, official press release, or verified journalist stated it explicitly.
-6. For description: write 2 sentences based only on what you actually found. Include the most recent verified development. Do NOT use generic descriptions.
-7. For latest news: find the single most recent news item about each company from the last 6 months.
+{{
+  "description": "2 sentences about what they do and their most recent development. Based only on what you found.",
+  "funding": "total funding raised e.g. $3B or null if not found",
+  "fundingSource": "URL of source or null",
+  "users": "user count e.g. 50M users or null if not found",
+  "usersSource": "URL of source or null",
+  "latestNews": "one sentence about most recent news or null",
+  "latestNewsUrl": "URL of that news or null",
+  "latestNewsDate": "date of news or null",
+  "website": "official website URL or null"
+}}
 
-Return ONLY a raw JSON array starting with [ and ending with ]. No markdown. No explanation. No code fences. No preamble.
+Return null for any field you cannot verify from search results."""
 
-IDs to use exactly: {json.dumps(ids)}
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1000,
+                tools=[{"type": "web_search_20250305", "name": "web_search"}],
+                messages=[{"role": "user", "content": prompt}]
+            )
 
-Return this exact schema for each:
-[
-  {{
-    "id": "exact id from list above",
-    "description": "2 verified sentences OR null if you found nothing specific",
-    "descriptionSource": "URL where you found this OR null",
-    "funding": "exact verified figure e.g. $3.5B total raised OR null if not found",
-    "fundingSource": "exact URL of source OR null",
-    "fundingDate": "date of most recent round e.g. March 2024 OR null",
-    "users": "exact verified figure e.g. 50M registered users OR null if not found",
-    "usersSource": "exact URL of source OR null",
-    "latestNews": "one sentence describing most recent verified news item OR null",
-    "latestNewsUrl": "URL of that news item OR null",
-    "latestNewsDate": "date of that news item OR null",
-    "website": "official website URL e.g. https://groww.in OR null"
-  }}
-]
+            # Get last text block
+            raw = ""
+            for block in response.content:
+                if hasattr(block, "text") and block.text and block.text.strip():
+                    raw = block.text.strip()
 
-CRITICAL: Return null — not empty string, not "—", not "unknown" — for any field you cannot verify. null means it will be hidden entirely from the dashboard."""
-
-        max_retries = 2
-        for attempt in range(max_retries):
-            try:
-                time.sleep(2)
-                response = client.messages.create(
-                    model="claude-sonnet-4-20250514",
-                    max_tokens=4000,
-                    tools=[{"type": "web_search_20250305", "name": "web_search"}],
-                    messages=[{"role": "user", "content": prompt}]
-                )
-
-                # Extract ONLY the last text block — this is where Sonnet puts the JSON
-                # Earlier text blocks contain search reasoning/preamble, not the JSON
-                raw = ""
-                for block in response.content:
-                    if hasattr(block, "text") and block.text and block.text.strip():
-                        raw = block.text.strip()  # Keep overwriting — last text block wins
-
-                def extract_json(text):
-                    """Try every possible way to extract a JSON array from text."""
-                    if not text:
-                        return None
-                    # 1. Direct parse
-                    try:
-                        r = json.loads(text)
-                        if isinstance(r, list): return r
-                    except Exception:
-                        pass
-                    # 2. Strip markdown fences
-                    try:
-                        clean = re.sub(r'```(?:json)?\s*', '', text).strip().rstrip('`').strip()
-                        r = json.loads(clean)
-                        if isinstance(r, list): return r
-                    except Exception:
-                        pass
-                    # 3. Find first [ to last ] — most reliable for extracting embedded arrays
-                    try:
-                        start = text.index('[')
-                        end = text.rindex(']') + 1
-                        r = json.loads(text[start:end])
-                        if isinstance(r, list): return r
-                    except Exception:
-                        pass
-                    # 4. Find first { to last } and wrap as array
-                    try:
-                        start = text.index('{')
-                        end = text.rindex('}') + 1
-                        r = json.loads('[' + text[start:end] + ']')
-                        if isinstance(r, list): return r
-                    except Exception:
-                        pass
+            # Extract JSON object
+            def extract_obj(text):
+                if not text:
                     return None
+                try:
+                    return json.loads(text)
+                except Exception:
+                    pass
+                try:
+                    clean = re.sub(r'```(?:json)?\s*', '', text).strip().rstrip('`').strip()
+                    return json.loads(clean)
+                except Exception:
+                    pass
+                try:
+                    start = text.index('{')
+                    end = text.rindex('}') + 1
+                    return json.loads(text[start:end])
+                except Exception:
+                    pass
+                return None
 
-                parsed = extract_json(raw)
+            result = extract_obj(raw)
+            if result and isinstance(result, dict):
+                for key, value in result.items():
+                    if value is not None and value != "" and value != "null":
+                        all_data[cid][key] = value
+                all_data[cid]["searched"] = True
+                print(f"    {c['name']} OK")
+            else:
+                print(f"    {c['name']} — parse failed")
 
-                if parsed:
-                    for item in parsed:
-                        cid = item.get("id")
-                        if cid and cid in all_data:
-                            for key, value in item.items():
-                                if key != "id" and value is not None and value != "" and value != "null":
-                                    all_data[cid][key] = value
-                    print(f"    Batch {batch_num} OK — {len(parsed)} researched")
-                    break
-                else:
-                    print(f"    Batch {batch_num} attempt {attempt+1} — parse failed, raw preview: {repr(raw[:200])}")
-                    if attempt < max_retries - 1:
-                        time.sleep(3)
+        except Exception as e:
+            print(f"    {c['name']} error: {e}")
 
-            except Exception as e:
-                print(f"    Batch {batch_num} attempt {attempt+1} error: {e}")
-                if attempt < max_retries - 1:
-                    time.sleep(5)
-
+    print(f"  Radar complete. {len(to_research)} companies researched, {len(COMPETITORS) - len(to_research)} static.")
     return all_data
+
 
 
 def build_radar_html(radar_data: dict, generated_at: str) -> str:
@@ -1035,23 +999,16 @@ if __name__ == "__main__":
     briefing_html = generate_briefing(client)
     print("Briefing generated.")
 
-    if is_monday:
-        print("Step 2: Monday — researching 50 competitors via web search...")
-        radar_data = generate_radar_data(client)
-        print("Research complete.")
+    # RADAR PAUSED — uncomment below to re-enable Monday Radar
+    # if is_monday:
+    #     print("Step 2: Monday — researching competitors...")
+    #     radar_data = generate_radar_data(client)
+    #     generated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p IST")
+    #     radar_html = build_radar_html(radar_data, generated_at)
+    #     push_radar_to_github(radar_html)
+    #     print("Radar live.")
 
-        print("Step 3: Building Radar HTML...")
-        generated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p IST")
-        radar_html = build_radar_html(radar_data, generated_at)
-        print("Radar HTML built.")
-
-        print("Step 4: Pushing Radar to GitHub Pages...")
-        push_radar_to_github(radar_html)
-        print("Radar live.")
-    else:
-        print("Step 2: Wed/Fri — skipping Radar refresh (runs Mondays only). Existing Radar stays live.")
-
-    print("Step 3: Sending email...")
+    print("Step 2: Sending email...")
     send_email(briefing_html)
 
     print("All done!")
