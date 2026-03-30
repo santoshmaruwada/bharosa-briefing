@@ -3,107 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bharosa Radar — March 23, 2026 at 06:58 AM IST</title>
+<title>Bharosa Radar — March 30, 2026 at 05:41 AM IST</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0b;color:#e5e5ea;font-family:'DM Sans',sans-serif;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
-.sticky-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid #1c1c1e;padding:12px 32px;display:flex;align-items:center;justify-content:space-between}
-.pulse{width:8px;height:8px;background:#30d158;border-radius:50%;animation:pulse 2s infinite;display:inline-block;margin-right:8px}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.sticky-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid #1c1c1e;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .verified-badge{background:#30d15822;color:#30d158;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;margin-left:8px;letter-spacing:0.5px}
 .hero{padding:48px 32px 32px;position:relative;z-index:1}
 .hero h1{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}
 .hero p{color:#8e8e93;font-size:15px;margin-bottom:4px}
-.verified-note{color:#30d158;font-size:12px;margin-bottom:28px;}
-.stat-pills{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+.integrity-note{background:#30d15812;border:1px solid #30d15833;border-radius:10px;padding:12px 16px;margin-bottom:28px;font-size:13px;color:#30d158;line-height:1.6}
+.stat-pills{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
 .pill{background:#1c1c1e;border:1px solid #2c2c2e;border-radius:10px;padding:14px 20px;text-align:center}
 .pill-num{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;display:block}
 .pill-label{font-size:11px;color:#8e8e93;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
 .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .filter-btn{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
 .filter-btn.active,.filter-btn:hover{background:#2c2c2e;color:#e5e5ea;border-color:#3a3a3c}
-.search-box{background:#1c1c1e;border:1px solid #2c2c2e;color:#e5e5ea;padding:7px 14px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;width:200px;outline:none}
+.search-box{background:#1c1c1e;border:1px solid #2c2c2e;color:#e5e5ea;padding:7px 14px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;width:220px;outline:none}
 .search-box:focus{border-color:#3a3a3c}
 .section-divider{padding:12px 32px;font-size:11px;font-weight:700;letter-spacing:3px;color:#3a3a3c;text-transform:uppercase;border-top:1px solid #1c1c1e;margin-top:8px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:0 32px 32px;position:relative;z-index:1}
-.card{background:#111113;border:1px solid #1c1c1e;border-radius:14px;padding:20px;transition:border-color 0.2s}
+.card{background:#111113;border:1px solid #1c1c1e;border-radius:14px;padding:22px;transition:border-color 0.2s}
 .card:hover{border-color:#2c2c2e}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.card-name{font-size:16px;font-weight:600;letter-spacing:-0.3px}
-.card-cat{font-size:11px;color:#636366;margin-top:2px}
-.badges{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.badge{padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
-.geo-badge{background:#1c1c1e;color:#636366;padding:3px 8px;border-radius:5px;font-size:11px}
-.desc{font-size:13px;color:#8e8e93;line-height:1.6;margin-bottom:14px}
-.radar-section-label{font-size:10px;font-weight:700;letter-spacing:2px;color:#3a3a3c;text-transform:uppercase;margin-bottom:8px}
-.radar-note{font-size:10px;color:#3a3a3c;margin-bottom:8px;font-style:italic}
-.radar-bars{margin-bottom:14px}
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.bar-label{font-size:11px;color:#636366;width:80px;flex-shrink:0}
-.bar-track{flex:1;background:#1c1c1e;border-radius:3px;height:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width 1s ease;width:0}
-.bar-val{font-family:'DM Mono',monospace;font-size:11px;color:#636366;width:28px;text-align:right}
-.stats-row{display:flex;gap:8px;margin-bottom:14px}
-.stat-box{flex:1;background:#0a0a0b;border:1px solid #1c1c1e;border-radius:8px;padding:8px 10px}
-.stat-box-label{font-size:10px;color:#636366;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:4px}
-.stat-verified{width:6px;height:6px;background:#30d158;border-radius:50%;display:inline-block}
-.stat-unverified{width:6px;height:6px;background:#636366;border-radius:50%;display:inline-block}
-.stat-box-val{font-size:13px;font-weight:600;margin-top:2px;font-family:'DM Mono',monospace}
-.stat-source{font-size:9px;color:#3a3a3c;margin-top:2px}
-.delta{font-size:10px;font-weight:600;margin-left:4px}
-.delta.pos{color:#30d158}.delta.neg{color:#ff453a}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.card-name{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.card-cat{font-size:12px;color:#636366;margin-top:3px}
+.badges{display:flex;gap:6px;align-items:center;flex-shrink:0;margin-left:12px}
+.geo-badge{background:#1c1c1e;color:#636366;padding:3px 8px;border-radius:5px;font-size:11px;border:1px solid #2c2c2e}
+.cat-badge{background:#1c1c1e;color:#8e8e93;padding:3px 8px;border-radius:5px;font-size:11px;border:1px solid #2c2c2e}
+.desc-block{margin-bottom:16px}
+.desc-text{font-size:14px;color:#aeaeb2;line-height:1.65;margin-bottom:6px}
+.desc-source{font-size:11px;color:#3a3a3c}
+.desc-source a{color:#30d158;text-decoration:none;}
+.desc-source a:hover{text-decoration:underline}
+.facts-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.fact-row{background:#0a0a0b;border:1px solid #1c1c1e;border-radius:10px;padding:12px 14px}
+.fact-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#636366;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.fact-verified-dot{width:6px;height:6px;background:#30d158;border-radius:50%;display:inline-block;flex-shrink:0}
+.fact-value{font-size:15px;font-weight:600;color:#e5e5ea;font-family:'DM Mono',monospace;margin-bottom:4px}
+.fact-meta{font-size:11px;color:#636366}
+.fact-meta a{color:#30d158;text-decoration:none}
+.fact-meta a:hover{text-decoration:underline}
+.news-block{background:#0a0a0b;border:1px solid #1c1c1e;border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.news-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#636366;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.news-text{font-size:13px;color:#aeaeb2;line-height:1.6;margin-bottom:4px}
+.news-meta{font-size:11px;color:#636366}
+.news-meta a{color:#007aff;text-decoration:none}
 .links{display:flex;gap:6px;flex-wrap:wrap}
-.link-btn{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;transition:all 0.2s}
+.link-btn{background:#1c1c1e;border:1px solid #2c2c2e;color:#8e8e93;padding:6px 12px;border-radius:7px;font-size:12px;text-decoration:none;transition:all 0.2s;font-family:'DM Sans',sans-serif}
 .link-btn:hover{background:#2c2c2e;color:#e5e5ea}
-.generated-note{text-align:center;padding:24px;color:#3a3a3c;font-size:12px;font-family:'DM Mono',monospace}
-.legend{display:flex;gap:16px;margin-bottom:16px;font-size:11px;color:#636366;align-items:center}
-.legend-item{display:flex;align-items:center;gap:4px}
+.link-btn.primary{background:#30d15822;border-color:#30d15844;color:#30d158}
+.link-btn.primary:hover{background:#30d15833}
+.no-data-note{font-size:12px;color:#3a3a3c;font-style:italic;margin-bottom:12px}
+.generated-note{text-align:center;padding:32px;color:#3a3a3c;font-size:12px;font-family:'DM Mono',monospace;line-height:1.8;border-top:1px solid #1c1c1e}
 </style>
 </head>
 <body>
 
 <div class="sticky-bar">
-  <div style="display:flex;align-items:center">
-    <span class="pulse"></span>
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">
     <span style="font-size:13px;font-weight:600;">Bharosa Radar</span>
-    <span class="verified-badge">WEB VERIFIED</span>
-    <span style="font-size:12px;color:#636366;margin-left:12px;">Generated March 23, 2026 at 06:58 AM IST</span>
+    <span class="verified-badge">&#10003; FACTS ONLY — WEB VERIFIED</span>
+    <span style="font-size:12px;color:#636366;margin-left:4px;">Generated March 30, 2026 at 05:41 AM IST</span>
   </div>
-  <div style="font-size:12px;color:#636366;">Facts sourced via live web search · Read-only snapshot</div>
+  <div style="font-size:12px;color:#636366;">No estimates · No scores · No guesses</div>
 </div>
 
 <div class="hero">
-  <h1>Competitor Radar</h1>
-  <p>50 players tracked. Funding and user data verified via live web search.</p>
-  <p class="verified-note">&#9679; Green dot = verified from source &nbsp;&#9679; Grey dot = not publicly available</p>
+  <h1>Competitor Intelligence</h1>
+  <p style="margin-bottom:16px;">50 companies tracked. Every data point sourced from a real URL. If we couldn't verify it, it's not shown.</p>
+
+  <div class="integrity-note">
+    <strong>Data integrity policy:</strong> This dashboard shows only facts verified via live web search at generation time.
+    Funding figures sourced from Crunchbase, TechCrunch, VCCircle, or official press releases.
+    User counts sourced from company announcements or verified press coverage.
+    Every fact has a clickable source link. If data was not publicly available, the field is hidden — not estimated.
+  </div>
+
   <div class="stat-pills">
-    <div class="pill"><span class="pill-num" style="color:#30d158;">50</span><span class="pill-label">Players</span></div>
+    <div class="pill"><span class="pill-num" style="color:#e5e5ea;">50</span><span class="pill-label">Tracked</span></div>
     <div class="pill"><span class="pill-num" style="color:#007aff;">20</span><span class="pill-label">India</span></div>
-    <div class="pill"><span class="pill-num" style="color:#ff453a;" id="high-count">1</span><span class="pill-label">High threat</span></div>
-    <div class="pill"><span class="pill-num" style="color:#ff9f0a;">30</span><span class="pill-label">Global</span></div>
+    <div class="pill"><span class="pill-num" style="color:#30d158;">0</span><span class="pill-label">Funding verified</span></div>
+    <div class="pill"><span class="pill-num" style="color:#30d158;">0</span><span class="pill-label">Users verified</span></div>
   </div>
-  <div class="legend">
-    <span>Analytical scores (not facts):</span>
-    <span class="legend-item"><span style="width:12px;height:4px;background:#af52de;border-radius:2px;display:inline-block"></span> AI Depth</span>
-    <span class="legend-item"><span style="width:12px;height:4px;background:#007aff;border-radius:2px;display:inline-block"></span> Orchestration</span>
-    <span class="legend-item"><span style="width:12px;height:4px;background:#ff9f0a;border-radius:2px;display:inline-block"></span> India Context</span>
-    <span class="legend-item"><span style="width:12px;height:4px;background:#30d158;border-radius:2px;display:inline-block"></span> Trust</span>
-    <span class="legend-item"><span style="width:12px;height:4px;background:#ff453a;border-radius:2px;display:inline-block"></span> Sentiment</span>
-  </div>
+
   <div class="controls">
-    <button class="filter-btn active" onclick="filter('all', event)">All</button>
-    <button class="filter-btn" onclick="filter('india', event)">India</button>
-    <button class="filter-btn" onclick="filter('global', event)">Global</button>
-    <button class="filter-btn" onclick="filter('high', event)">High threat</button>
-    <button class="filter-btn" onclick="filter('watch', event)">Watch</button>
-    <input class="search-box" type="text" placeholder="Search..." oninput="search(this.value)">
-    <select class="filter-btn" onchange="sortBy(this.value)" style="padding:7px 12px">
-      <option value="threat">Sort: Threat</option>
-      <option value="grade">Sort: Grade</option>
-      <option value="aiDepth">Sort: AI Depth</option>
+    <button class="filter-btn active" onclick="setFilter('all', event)">All</button>
+    <button class="filter-btn" onclick="setFilter('india', event)">India</button>
+    <button class="filter-btn" onclick="setFilter('global', event)">Global</button>
+    <button class="filter-btn" onclick="setFilter('verified', event)">Has verified data</button>
+    <input class="search-box" type="text" placeholder="Search by name or category..." oninput="setSearch(this.value)">
+    <select class="filter-btn" onchange="setSort(this.value)" style="padding:7px 12px">
       <option value="name">Sort: A–Z</option>
+      <option value="geo">Sort: India first</option>
+      <option value="data">Sort: Most data</option>
     </select>
   </div>
 </div>
@@ -114,107 +110,144 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div id="global-grid" class="grid"></div>
 
 <div class="generated-note">
-  Bharosa Radar · Generated March 23, 2026 at 06:58 AM IST<br>
-  Funding &amp; user data sourced via live web search. Analytical scores reflect Bharosa team's competitive assessment.<br>
-  "—" means data was not publicly available at time of generation.
+  Bharosa Radar · March 30, 2026 at 05:41 AM IST<br>
+  All data sourced via live web search at generation time.<br>
+  Hidden fields = data not publicly available or not found — never estimated.<br>
+  Source links open the exact page where data was found.
 </div>
 
 <script>
 const COMPETITORS = [
-{"id": "groww", "name": "Groww", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Groww...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "groww"},
-{"id": "kuvera", "name": "Kuvera / CRED", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Kuvera / CRED...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "kuvera / cred"},
-{"id": "indmoney", "name": "INDmoney", "geo": "India", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching INDmoney...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "indmoney"},
-{"id": "jarvis", "name": "Jarvis Invest", "geo": "India", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Jarvis Invest...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "jarvis invest"},
-{"id": "zerodha", "name": "Zerodha", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Zerodha...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "zerodha"},
-{"id": "smallcase", "name": "Smallcase", "geo": "India", "category": "Platform", "grade": "B+", "gradeColor": "#30d158", "threat": "high", "threatColor": "#ff453a", "description": "<cite index=\"3-3\">Smallcase raised $50M Series D funding led by Elev8 Venture Partners with participation from State Street Global Advisors & Niveshaay AIF and existing investors Faering Capital & Arkam Ventures.</cite> <cite index=\"25-6,25-15\">Zerodha Fund House, the smallcase\u2013Zerodha joint venture focused on index-based funds, has crossed Rs 10,000 crore AUM in just two years of launch.</cite>", "fundingUpdated": "$50M Series D", "usersUpdated": "10M+ users", "fundingSource": "https://www.smallcase.com/blog/smallcase-raises-50m-in-series-d-funding/", "usersSource": "https://www.angelone.in/news/market-updates/smallcase-surpasses-100-crore-revenue-milestone-in-fy25-with-strong-growth", "fundingDelta": "+$50M Series D", "usersDelta": "", "aiScore": 25, "aiScoreDelta": "", "sentiment": 85, "aiDepth": 15, "orchestration": 30, "indiaContext": 95, "trust": 85, "searchName": "smallcase"},
-{"id": "investorai", "name": "InvestorAi", "geo": "India", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "watch", "threatColor": "#007aff", "description": "<cite index=\"38-1\">InvestorAi has successfully raised \u20b980 crore ($9.56 million) in a Series A funding round, led by Ashish Kacholia.</cite> <cite index=\"53-9,53-10\">India's first foundation AI equity recommendation platform, InvestorAi, has announced a series of senior leadership appointments including Gopinath Natarajan as President & Head of Markets.</cite>", "fundingUpdated": "\u20b980 Cr Series A", "usersUpdated": "\u2014", "fundingSource": "https://www.business-standard.com/companies/news/investorai-raises-rs-80-cr-in-funding-from-ashish-kacholia-associates-124082201201_1.html", "usersSource": "", "fundingDelta": "+\u20b980 Cr Series A", "usersDelta": "", "aiScore": 90, "aiScoreDelta": "", "sentiment": 70, "aiDepth": 95, "orchestration": 20, "indiaContext": 85, "trust": 75, "searchName": "investorai"},
-{"id": "etmoney", "name": "ET Money", "geo": "India", "category": "Platform", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "<cite index=\"62-6\">In June 2024, was acquired by 360 One Wealth and Asset Management for 366 crores ($44 Million).</cite> <cite index=\"68-4,68-5\">A financial services company launched Loans Against Mutual Funds, allowing investors to borrow against their mutual fund holdings through digital platform.</cite>", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 10, "aiScoreDelta": "", "sentiment": 70, "aiDepth": 5, "orchestration": 15, "indiaContext": 90, "trust": 80, "searchName": "et money"},
-{"id": "paytmmoney", "name": "Paytm Money", "geo": "India", "category": "Platform", "grade": "C", "gradeColor": "#ff453a", "threat": "low", "threatColor": "#30d158", "description": "\u2014", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 5, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 5, "orchestration": 10, "indiaContext": 75, "trust": 70, "searchName": "paytm money"},
-{"id": "angelone", "name": "Angel One", "geo": "India", "category": "Platform", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "\u2014", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 10, "aiScoreDelta": "", "sentiment": 75, "aiDepth": 10, "orchestration": 20, "indiaContext": 85, "trust": 85, "searchName": "angel one"},
-{"id": "upstox", "name": "Upstox", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Upstox...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "upstox"},
-{"id": "tickertape", "name": "Tickertape", "geo": "India", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Tickertape...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "tickertape"},
-{"id": "navi", "name": "Navi", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Navi...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "navi"},
-{"id": "wealthy", "name": "Wealthy.in", "geo": "India", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Wealthy.in...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "wealthy.in"},
-{"id": "dhan", "name": "Dhan", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Dhan...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "dhan"},
-{"id": "orowealth", "name": "Orowealth", "geo": "India", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Orowealth...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "orowealth"},
-{"id": "goalwise", "name": "Goalwise", "geo": "India", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Goalwise...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "goalwise"},
-{"id": "finity", "name": "Finity", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Finity...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "finity"},
-{"id": "plnr", "name": "PLNR", "geo": "India", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching PLNR...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "plnr"},
-{"id": "mprofit", "name": "mProfit", "geo": "India", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching mProfit...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 60, "trust": 55, "searchName": "mprofit"},
-{"id": "origin", "name": "Origin Financial", "geo": "Global", "category": "AI Advisory", "grade": "B+", "gradeColor": "#30d158", "threat": "low", "threatColor": "#30d158", "description": "Origin is a comprehensive employee financial wellness platform providing personalized financial planning through AI and human planners. In September 2025, Origin launched the first SEC-regulated AI financial advisor that outperformed leading AI models on CFP exams.", "fundingUpdated": "$56M Series B", "usersUpdated": "\u2014", "fundingSource": "https://www.fintechfutures.com/venture-capital-funding/financial-wellness-platform-origin-raises-56m-funding-at-400m-valuation", "usersSource": "", "fundingDelta": "+$56M Series B", "usersDelta": "", "aiScore": 85, "aiScoreDelta": "", "sentiment": 70, "aiDepth": 90, "orchestration": 65, "indiaContext": 0, "trust": 80, "searchName": "origin financial"},
-{"id": "wealthfront", "name": "Wealthfront", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Wealthfront is a tech-driven robo-advisor serving 1.3+ million clients with $95B+ in assets. In December 2025, the company went public raising $485 million at a $2.1B valuation and launched new products including Home Lending and Nasdaq-100 Direct investing.", "fundingUpdated": "$274M total raised + $485M IPO", "usersUpdated": "1.3M clients", "fundingSource": "https://en.wikipedia.org/wiki/Wealthfront", "usersSource": "https://en.wikipedia.org/wiki/Wealthfront", "fundingDelta": "+$485M IPO", "usersDelta": "", "aiScore": 60, "aiScoreDelta": "", "sentiment": 75, "aiDepth": 50, "orchestration": 70, "indiaContext": 0, "trust": 85, "searchName": "wealthfront"},
-{"id": "betterment", "name": "Betterment", "geo": "Global", "category": "Robo-advisor", "grade": "B-", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Betterment is an automated investment and retirement planning platform managing assets for nearly 700,000 clients. The company raised $160M in 2021 including $60M Series F and $100M credit facility, focusing on 401(k) offerings for SMBs.", "fundingUpdated": "$335M total funding", "usersUpdated": "700K clients", "fundingSource": "https://tracxn.com/d/companies/betterment/__kdMbHERiJSosG5WjoQd5JFOISXbS1xC7PtXoWghEwFw/funding-and-investors", "usersSource": "https://finovate.com/betterment-raises-160-million-with-1-3-billion-valuation/", "fundingDelta": "+$160M in 2021", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 80, "aiDepth": 30, "orchestration": 60, "indiaContext": 0, "trust": 90, "searchName": "betterment"},
-{"id": "portfoliopilot", "name": "PortfolioPilot", "geo": "Global", "category": "AI-Native", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "\u2014", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 40, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 35, "orchestration": 40, "indiaContext": 0, "trust": 70, "searchName": "portfoliopilot"},
-{"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting", "grade": "C+", "gradeColor": "#ff9f0a", "threat": "low", "threatColor": "#30d158", "description": "\u2014", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 50, "aiScoreDelta": "", "sentiment": 65, "aiDepth": 40, "orchestration": 55, "indiaContext": 0, "trust": 75, "searchName": "monarch money"},
-{"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Copilot Money...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "copilot money"},
-{"id": "conquest", "name": "Conquest Planning", "geo": "Global", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Conquest Planning...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "conquest planning"},
-{"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Cleo...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "cleo"},
-{"id": "plum", "name": "Plum", "geo": "Global", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Plum...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "plum"},
-{"id": "ynab", "name": "YNAB", "geo": "Global", "category": "Budgeting", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching YNAB...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "ynab"},
-{"id": "range", "name": "Range", "geo": "Global", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Range...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "range"},
-{"id": "rocketmoney", "name": "Rocket Money", "geo": "Global", "category": "Budgeting", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Rocket Money...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "rocket money"},
-{"id": "robinhood", "name": "Robinhood Gold", "geo": "Global", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Robinhood Gold...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "robinhood gold"},
-{"id": "schwab", "name": "Schwab Intelligent", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Schwab Intelligent...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "schwab intelligent"},
-{"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Empower...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "empower"},
-{"id": "wally", "name": "Wally", "geo": "Global", "category": "Budgeting", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Wally...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "wally"},
-{"id": "acorns", "name": "Acorns", "geo": "Global", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Acorns...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "acorns"},
-{"id": "arta", "name": "Arta Finance", "geo": "Global", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Arta Finance...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "arta finance"},
-{"id": "stashaway", "name": "StashAway", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching StashAway...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "stashaway"},
-{"id": "syfe", "name": "Syfe", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Syfe...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "syfe"},
-{"id": "endowus", "name": "Endowus", "geo": "Global", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Endowus...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "endowus"},
-{"id": "magnifi", "name": "Magnifi", "geo": "Global", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Magnifi...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "magnifi"},
-{"id": "moneylion", "name": "MoneyLion", "geo": "Global", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching MoneyLion...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "moneylion"},
-{"id": "bambu", "name": "Bambu", "geo": "Global", "category": "AI Advisory", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Bambu...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "bambu"},
-{"id": "savvy", "name": "Savvy Wealth", "geo": "Global", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Savvy Wealth...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "savvy wealth"},
-{"id": "scalable", "name": "Scalable Capital", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Scalable Capital...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "scalable capital"},
-{"id": "nutmeg", "name": "Nutmeg", "geo": "Global", "category": "Robo-advisor", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Nutmeg...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "nutmeg"},
-{"id": "addepar", "name": "Addepar", "geo": "Global", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Addepar...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "addepar"},
-{"id": "orion", "name": "Orion Advisor", "geo": "Global", "category": "Platform", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Orion Advisor...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "orion advisor"},
-{"id": "perfios", "name": "Perfios", "geo": "Global", "category": "AI-Native", "grade": "B", "gradeColor": "#ff9f0a", "threat": "medium", "threatColor": "#ff9f0a", "description": "Researching Perfios...", "fundingUpdated": "\u2014", "usersUpdated": "\u2014", "fundingSource": "", "usersSource": "", "fundingDelta": "", "usersDelta": "", "aiScore": 45, "aiScoreDelta": "", "sentiment": 60, "aiDepth": 40, "orchestration": 30, "indiaContext": 20, "trust": 55, "searchName": "perfios"}
+{"id": "groww", "name": "Groww", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "groww"},
+{"id": "kuvera", "name": "Kuvera / CRED", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "kuvera / cred"},
+{"id": "indmoney", "name": "INDmoney", "geo": "India", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "indmoney"},
+{"id": "jarvis", "name": "Jarvis Invest", "geo": "India", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "jarvis invest"},
+{"id": "zerodha", "name": "Zerodha", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "zerodha"},
+{"id": "smallcase", "name": "Smallcase", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "smallcase"},
+{"id": "investorai", "name": "InvestorAi", "geo": "India", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "investorai"},
+{"id": "etmoney", "name": "ET Money", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "et money"},
+{"id": "paytmmoney", "name": "Paytm Money", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "paytm money"},
+{"id": "angelone", "name": "Angel One", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "angel one"},
+{"id": "upstox", "name": "Upstox", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "upstox"},
+{"id": "tickertape", "name": "Tickertape", "geo": "India", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "tickertape"},
+{"id": "navi", "name": "Navi", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "navi"},
+{"id": "wealthy", "name": "Wealthy.in", "geo": "India", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "wealthy.in"},
+{"id": "dhan", "name": "Dhan", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "dhan"},
+{"id": "orowealth", "name": "Orowealth", "geo": "India", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "orowealth"},
+{"id": "goalwise", "name": "Goalwise", "geo": "India", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "goalwise"},
+{"id": "finity", "name": "Finity", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "finity"},
+{"id": "plnr", "name": "PLNR", "geo": "India", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "plnr"},
+{"id": "mprofit", "name": "mProfit", "geo": "India", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "mprofit"},
+{"id": "origin", "name": "Origin Financial", "geo": "Global", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "origin financial"},
+{"id": "wealthfront", "name": "Wealthfront", "geo": "Global", "category": "Robo-advisor", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "wealthfront"},
+{"id": "betterment", "name": "Betterment", "geo": "Global", "category": "Robo-advisor", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "betterment"},
+{"id": "portfoliopilot", "name": "PortfolioPilot", "geo": "Global", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "portfoliopilot"},
+{"id": "monarch", "name": "Monarch Money", "geo": "Global", "category": "Budgeting", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "monarch money"},
+{"id": "copilot", "name": "Copilot Money", "geo": "Global", "category": "Budgeting", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "copilot money"},
+{"id": "conquest", "name": "Conquest Planning", "geo": "Global", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "conquest planning"},
+{"id": "cleo", "name": "Cleo", "geo": "Global", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "cleo"},
+{"id": "plum", "name": "Plum", "geo": "Global", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "plum"},
+{"id": "ynab", "name": "YNAB", "geo": "Global", "category": "Budgeting", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "ynab"},
+{"id": "range", "name": "Range", "geo": "Global", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "range"},
+{"id": "rocketmoney", "name": "Rocket Money", "geo": "Global", "category": "Budgeting", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "rocket money"},
+{"id": "robinhood", "name": "Robinhood Gold", "geo": "Global", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "robinhood gold"},
+{"id": "schwab", "name": "Schwab Intelligent", "geo": "Global", "category": "Robo-advisor", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "schwab intelligent"},
+{"id": "empower", "name": "Empower", "geo": "Global", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "empower"},
+{"id": "wally", "name": "Wally", "geo": "Global", "category": "Budgeting", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "wally"},
+{"id": "acorns", "name": "Acorns", "geo": "Global", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "acorns"},
+{"id": "arta", "name": "Arta Finance", "geo": "Global", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "arta finance"},
+{"id": "stashaway", "name": "StashAway", "geo": "Global", "category": "Robo-advisor", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "stashaway"},
+{"id": "syfe", "name": "Syfe", "geo": "Global", "category": "Robo-advisor", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "syfe"},
+{"id": "endowus", "name": "Endowus", "geo": "Global", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "endowus"},
+{"id": "magnifi", "name": "Magnifi", "geo": "Global", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "magnifi"},
+{"id": "moneylion", "name": "MoneyLion", "geo": "Global", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "moneylion"},
+{"id": "bambu", "name": "Bambu", "geo": "Global", "category": "AI Advisory", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "bambu"},
+{"id": "savvy", "name": "Savvy Wealth", "geo": "Global", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "savvy wealth"},
+{"id": "scalable", "name": "Scalable Capital", "geo": "Global", "category": "Robo-advisor", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "scalable capital"},
+{"id": "nutmeg", "name": "Nutmeg", "geo": "Global", "category": "Robo-advisor", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "nutmeg"},
+{"id": "addepar", "name": "Addepar", "geo": "Global", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "addepar"},
+{"id": "orion", "name": "Orion Advisor", "geo": "Global", "category": "Platform", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "orion advisor"},
+{"id": "perfios", "name": "Perfios", "geo": "Global", "category": "AI-Native", "description": null, "descriptionSource": null, "funding": null, "fundingSource": null, "fundingDate": null, "users": null, "usersSource": null, "latestNews": null, "latestNewsUrl": null, "latestNewsDate": null, "website": null, "searchName": "perfios"}
 ];
 
 let currentFilter = 'all';
 let currentSearch = '';
-let currentSort = 'threat';
+let currentSort = 'name';
 
-const threatOrder = {'high':0,'medium':1,'watch':2,'low':3};
-const gradeOrder = {'A':0,'B+':1,'B':2,'B-':3,'C+':4,'C':5,'C-':6,'D+':7,'D':8};
+function dataScore(c) {
+  let s = 0;
+  if (c.description) s++;
+  if (c.funding) s++;
+  if (c.users) s++;
+  if (c.latestNews) s++;
+  return s;
+}
 
 function buildCard(c) {
   const encName = encodeURIComponent(c.name);
-  const newsUrl = `https://www.google.com/search?q=${encName}+fintech+news+2026`;
-  const fundUrl = c.fundingSource || `https://www.google.com/search?q=${encName}+funding+crunchbase`;
-  const revUrl = `https://www.google.com/search?q=${encName}+user+reviews+reddit`;
-  const siteUrl = `https://www.google.com/search?q=${encName}+official+site`;
+  const newsSearchUrl = `https://www.google.com/search?q=${encName}+fintech+news+2025+2026`;
+  const fundSearchUrl = `https://www.google.com/search?q=${encName}+funding+crunchbase+raised`;
+  const revSearchUrl = `https://www.google.com/search?q=${encName}+user+reviews+reddit+trustpilot`;
+  const websiteUrl = c.website || `https://www.google.com/search?q=${encName}+official+website`;
 
-  const fundVerified = c.fundingUpdated !== '—' && c.fundingUpdated !== '';
-  const usersVerified = c.usersUpdated !== '—' && c.usersUpdated !== '';
+  // Description block — only if verified
+  let descHtml = '';
+  if (c.description) {
+    const srcLink = c.descriptionSource
+      ? `<a href="${c.descriptionSource}" target="_blank">source ↗</a>`
+      : '';
+    descHtml = `<div class="desc-block">
+      <div class="desc-text">${c.description}</div>
+      ${srcLink ? `<div class="desc-source">${srcLink}</div>` : ''}
+    </div>`;
+  }
 
-  const fdelta = c.fundingDelta ? `<span class="delta pos">${c.fundingDelta}</span>` : '';
-  const udelta = c.usersDelta ? `<span class="delta pos">${c.usersDelta}</span>` : '';
-  const adelta = c.aiScoreDelta ? `<span class="delta pos">${c.aiScoreDelta}</span>` : '';
+  // Facts — only show verified ones
+  let factsHtml = '';
+  const facts = [];
 
-  const bars = [
-    ['AI Depth', c.aiDepth, '#af52de'],
-    ['Orchestrate', c.orchestration, '#007aff'],
-    ['India Ctx', c.indiaContext, '#ff9f0a'],
-    ['Trust', c.trust, '#30d158'],
-    ['Sentiment', c.sentiment, '#ff453a'],
-  ].map(([label, val, color]) => `
-    <div class="bar-row">
-      <span class="bar-label">${label}</span>
-      <div class="bar-track"><div class="bar-fill" data-width="${val}" style="background:${color};width:0%"></div></div>
-      <span class="bar-val">${val}</span>
-    </div>`).join('');
+  if (c.funding) {
+    const srcLink = c.fundingSource ? `<a href="${c.fundingSource}" target="_blank">source ↗</a>` : '';
+    const dateStr = c.fundingDate ? ` · ${c.fundingDate}` : '';
+    facts.push(`<div class="fact-row">
+      <div class="fact-label"><span class="fact-verified-dot"></span>Total Funding</div>
+      <div class="fact-value">${c.funding}</div>
+      <div class="fact-meta">${dateStr}${srcLink ? ' · ' + srcLink : ''}</div>
+    </div>`);
+  }
 
-  const fundSourceLink = c.fundingSource
-    ? `<a href="${c.fundingSource}" target="_blank" style="color:#30d158;font-size:9px;text-decoration:none;">source ↗</a>`
+  if (c.users) {
+    const srcLink = c.usersSource ? `<a href="${c.usersSource}" target="_blank">source ↗</a>` : '';
+    facts.push(`<div class="fact-row">
+      <div class="fact-label"><span class="fact-verified-dot"></span>Users</div>
+      <div class="fact-value">${c.users}</div>
+      <div class="fact-meta">${srcLink}</div>
+    </div>`);
+  }
+
+  if (facts.length > 0) {
+    factsHtml = `<div class="facts-grid">${facts.join('')}</div>`;
+  }
+
+  // Latest news — only if verified
+  let newsHtml = '';
+  if (c.latestNews) {
+    const newsLink = c.latestNewsUrl ? `<a href="${c.latestNewsUrl}" target="_blank">Read →</a>` : '';
+    const dateStr = c.latestNewsDate ? `${c.latestNewsDate} · ` : '';
+    newsHtml = `<div class="news-block">
+      <div class="news-label"><span class="fact-verified-dot"></span>Latest News</div>
+      <div class="news-text">${c.latestNews}</div>
+      <div class="news-meta">${dateStr}${newsLink}</div>
+    </div>`;
+  }
+
+  // If nothing verified at all
+  const hasAnyData = c.description || c.funding || c.users || c.latestNews;
+  const noDataHtml = !hasAnyData
+    ? `<div class="no-data-note">No publicly available data found at generation time.</div>`
     : '';
-  const usersSourceLink = c.usersSource
-    ? `<a href="${c.usersSource}" target="_blank" style="color:#30d158;font-size:9px;text-decoration:none;">source ↗</a>`
-    : '';
 
-  return `<div class="card" data-id="${c.id}" data-geo="${c.geo.toLowerCase()}" data-threat="${c.threat}">
+  return `<div class="card" data-id="${c.id}" data-geo="${c.geo.toLowerCase()}" data-has-data="${hasAnyData ? '1' : '0'}">
     <div class="card-top">
       <div>
         <div class="card-name">${c.name}</div>
@@ -222,100 +255,74 @@ function buildCard(c) {
       </div>
       <div class="badges">
         <span class="geo-badge">${c.geo}</span>
-        <span class="badge" style="background:${c.gradeColor}22;color:${c.gradeColor}">${c.grade}</span>
-        <span class="badge" style="background:${c.threatColor}22;color:${c.threatColor}">${c.threat}</span>
       </div>
     </div>
-    <div class="desc">${c.description}</div>
-    <div class="radar-note">Analytical scores — competitive assessment vs Bharosa's moat</div>
-    <div class="radar-bars">${bars}</div>
-    <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-box-label">
-          <span class="${fundVerified ? 'stat-verified' : 'stat-unverified'}"></span>
-          Funding
-        </div>
-        <div class="stat-box-val">${c.fundingUpdated}${fdelta}</div>
-        <div class="stat-source">${fundSourceLink}</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-box-label">
-          <span class="${usersVerified ? 'stat-verified' : 'stat-unverified'}"></span>
-          Users
-        </div>
-        <div class="stat-box-val">${c.usersUpdated}${udelta}</div>
-        <div class="stat-source">${usersSourceLink}</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-box-label">
-          <span class="stat-unverified"></span>
-          AI Score
-        </div>
-        <div class="stat-box-val">${c.aiScore}${adelta}</div>
-      </div>
-    </div>
+    ${descHtml}
+    ${factsHtml}
+    ${newsHtml}
+    ${noDataHtml}
     <div class="links">
-      <a class="link-btn" href="${newsUrl}" target="_blank">Latest news</a>
-      <a class="link-btn" href="${fundUrl}" target="_blank">Funding</a>
-      <a class="link-btn" href="${revUrl}" target="_blank">Reviews</a>
-      <a class="link-btn" href="${siteUrl}" target="_blank">Website</a>
+      ${c.website ? `<a class="link-btn primary" href="${c.website}" target="_blank">Website ↗</a>` : ''}
+      <a class="link-btn" href="${newsSearchUrl}" target="_blank">News</a>
+      <a class="link-btn" href="${fundSearchUrl}" target="_blank">Funding</a>
+      <a class="link-btn" href="${revSearchUrl}" target="_blank">Reviews</a>
     </div>
   </div>`;
 }
 
 function render() {
-  const india = document.getElementById('india-grid');
-  const global = document.getElementById('global-grid');
-  india.innerHTML = '';
-  global.innerHTML = '';
+  const indiaGrid = document.getElementById('india-grid');
+  const globalGrid = document.getElementById('global-grid');
+  indiaGrid.innerHTML = '';
+  globalGrid.innerHTML = '';
 
   let sorted = [...COMPETITORS];
-  if (currentSort === 'threat') sorted.sort((a,b) => (threatOrder[a.threat]||9)-(threatOrder[b.threat]||9));
-  else if (currentSort === 'grade') sorted.sort((a,b) => (gradeOrder[a.grade]||9)-(gradeOrder[b.grade]||9));
-  else if (currentSort === 'aiDepth') sorted.sort((a,b) => b.aiDepth-a.aiDepth);
-  else if (currentSort === 'name') sorted.sort((a,b) => a.name.localeCompare(b.name));
+  if (currentSort === 'name') sorted.sort((a,b) => a.name.localeCompare(b.name));
+  else if (currentSort === 'geo') sorted.sort((a,b) => a.geo === 'India' ? -1 : 1);
+  else if (currentSort === 'data') sorted.sort((a,b) => dataScore(b) - dataScore(a));
 
   let indiaVisible = 0, globalVisible = 0;
 
   sorted.forEach(c => {
-    const geoMatch = currentFilter === 'all' ||
+    const geoMatch =
+      currentFilter === 'all' ||
       (currentFilter === 'india' && c.geo === 'India') ||
       (currentFilter === 'global' && c.geo === 'Global') ||
-      (currentFilter === 'high' && c.threat === 'high') ||
-      (currentFilter === 'watch' && c.threat === 'watch');
-    const searchMatch = !currentSearch || c.searchName.includes(currentSearch) ||
+      (currentFilter === 'verified' && c['has-data'] !== '0' && (c.description || c.funding || c.users || c.latestNews));
+
+    const searchMatch = !currentSearch ||
+      c.searchName.includes(currentSearch) ||
       c.category.toLowerCase().includes(currentSearch) ||
       c.geo.toLowerCase().includes(currentSearch);
 
-    if (geoMatch && searchMatch) {
-      if (c.geo === 'India') { india.innerHTML += buildCard(c); indiaVisible++; }
-      else { global.innerHTML += buildCard(c); globalVisible++; }
+    // For verified filter, check data directly
+    const verifiedMatch = currentFilter !== 'verified' ||
+      (c.description || c.funding || c.users || c.latestNews);
+
+    if ((currentFilter === 'verified' ? verifiedMatch : geoMatch) && searchMatch) {
+      const html = buildCard(c);
+      if (c.geo === 'India') { indiaGrid.innerHTML += html; indiaVisible++; }
+      else { globalGrid.innerHTML += html; globalVisible++; }
     }
   });
 
   document.getElementById('india-divider').style.display = indiaVisible ? '' : 'none';
   document.getElementById('global-divider').style.display = globalVisible ? '' : 'none';
-
-  setTimeout(() => {
-    document.querySelectorAll('.bar-fill').forEach(el => {
-      el.style.width = el.dataset.width + '%';
-    });
-  }, 100);
 }
 
-function filter(f, event) {
+function setFilter(f, event) {
   currentFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   if (event && event.target) event.target.classList.add('active');
   render();
 }
 
-function search(val) {
+function setSearch(val) {
   currentSearch = val.toLowerCase();
   render();
 }
 
-function sortBy(val) {
+function setSort(val) {
   currentSort = val;
   render();
 }
