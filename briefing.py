@@ -227,41 +227,61 @@ CRITICAL: Return null — not empty string, not "—", not "unknown" — for any
                     messages=[{"role": "user", "content": prompt}]
                 )
 
-                # Extract text blocks only
+                # Extract ONLY the last text block — this is where Sonnet puts the JSON
+                # Earlier text blocks contain search reasoning/preamble, not the JSON
                 raw = ""
                 for block in response.content:
-                    if hasattr(block, "text") and block.text:
-                        raw += block.text
+                    if hasattr(block, "text") and block.text and block.text.strip():
+                        raw = block.text.strip()  # Keep overwriting — last text block wins
 
-                raw = raw.strip()
-
-                # Robust JSON extraction
-                parsed = None
-                for extractor in [
-                    lambda t: json.loads(t),
-                    lambda t: json.loads(re.sub(r'```[a-z]*\n?', '', t).strip()),
-                    lambda t: json.loads(re.search(r'\[.*\]', t, re.DOTALL).group()) if re.search(r'\[.*\]', t, re.DOTALL) else None,
-                ]:
+                def extract_json(text):
+                    """Try every possible way to extract a JSON array from text."""
+                    if not text:
+                        return None
+                    # 1. Direct parse
                     try:
-                        result = extractor(raw)
-                        if result and isinstance(result, list):
-                            parsed = result
-                            break
+                        r = json.loads(text)
+                        if isinstance(r, list): return r
                     except Exception:
-                        continue
+                        pass
+                    # 2. Strip markdown fences
+                    try:
+                        clean = re.sub(r'```(?:json)?\s*', '', text).strip().rstrip('`').strip()
+                        r = json.loads(clean)
+                        if isinstance(r, list): return r
+                    except Exception:
+                        pass
+                    # 3. Find first [ to last ] — most reliable for extracting embedded arrays
+                    try:
+                        start = text.index('[')
+                        end = text.rindex(']') + 1
+                        r = json.loads(text[start:end])
+                        if isinstance(r, list): return r
+                    except Exception:
+                        pass
+                    # 4. Find first { to last } and wrap as array
+                    try:
+                        start = text.index('{')
+                        end = text.rindex('}') + 1
+                        r = json.loads('[' + text[start:end] + ']')
+                        if isinstance(r, list): return r
+                    except Exception:
+                        pass
+                    return None
+
+                parsed = extract_json(raw)
 
                 if parsed:
                     for item in parsed:
                         cid = item.get("id")
                         if cid and cid in all_data:
-                            # Only update with non-null values
                             for key, value in item.items():
-                                if key != "id" and value is not None:
+                                if key != "id" and value is not None and value != "" and value != "null":
                                     all_data[cid][key] = value
                     print(f"    Batch {batch_num} OK — {len(parsed)} researched")
                     break
                 else:
-                    print(f"    Batch {batch_num} attempt {attempt+1} — parse failed")
+                    print(f"    Batch {batch_num} attempt {attempt+1} — parse failed, raw preview: {repr(raw[:200])}")
                     if attempt < max_retries - 1:
                         time.sleep(3)
 
