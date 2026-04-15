@@ -2,7 +2,7 @@
 briefing.py — Bharosa Morning Intelligence Brief
 ─────────────────────────────────────────────────
 Runs Mon / Wed / Fri via GitHub Actions.
-Calls Anthropic API (claude-opus-4-6, web_search enabled).
+Calls Anthropic API (claude-sonnet-4-6, web_search enabled).
 Sends one HTML email to the full team.
 
 GitHub Secrets required:
@@ -35,8 +35,8 @@ ANTHROPIC_API_KEY  = os.environ["ANTHROPIC_API_KEY"]
 GMAIL_USER         = os.environ["GMAIL_USER"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 
-MODEL      = "claude-opus-4-6"
-MAX_TOKENS = 8000
+MODEL      = "claude-sonnet-4-6"
+MAX_TOKENS = 16000
 
 RECIPIENTS = [
     "santosh@bharosa.finance",
