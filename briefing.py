@@ -184,6 +184,19 @@ MANDATORY SEARCH SEQUENCE - run ALL before writing a single word:
   8. RBI data localisation financial data India 2026
   9. on-device LLM finance edge inference 2026
   10. NPS EPF CDSL data API India fintech 2026
+  11. site:reddit.com XIRR portfolio tracker India 2026
+  12. site:reddit.com mutual fund India IFA commission 2026
+
+REDDIT AND EXTERNAL LINK RULES - CRITICAL - READ CAREFULLY:
+  - NEVER construct, guess, or invent a Reddit URL. Only use URLs that appeared directly in your search results.
+  - A URL is only valid if you actually fetched it or it appeared verbatim in a search result snippet.
+  - Every Reddit link must start with reddit.com/r/ followed by a verified subreddit name.
+  - Safe subreddits only: r/IndiaInvestments, r/personalfinanceindia, r/mutualfunds, r/FIREIndia, r/IndiaStocks, r/tax, r/Bogleheads, r/personalfinance, r/financialindependence, r/hacking_tutorials is NOT safe.
+  - If you are not 100% certain a URL is real and leads to the correct thread, DO NOT include it.
+  - Fewer real links is always better than more fake or wrong links.
+  - For HN links use: news.ycombinator.com/item?id=[real_id_from_search]
+  - For X/Twitter links use only URLs that appeared in search results.
+  - If you cannot find enough verified thread URLs, include only what you found. 2 real links beats 6 hallucinated ones.
 
 OUTPUT: Return ONLY raw HTML starting with <!DOCTYPE html>. Inline CSS only (no style tags). No markdown. No preamble."""
 
@@ -194,14 +207,15 @@ USER_PROMPT_BASE = """Generate today's Bharosa Morning Brief. Today is {date}, {
 
 {monday_instruction}
 
-Run ALL 10 searches in the mandatory sequence before writing anything.
+Run ALL 12 searches in the mandatory sequence before writing anything.
 
 QUALITY GATE - verify before finalising:
   - Every signal names a specific company, product, or regulatory body
   - Every action line is concrete (not "monitor this" unless it is a WATCH signal)
   - The contrarian take is about Indian IFA/fintech beliefs specifically, not generic AI skepticism
   - The battle card update names the specific row and the specific change needed
-  - Worth Reading has actual discussion thread URLs (Reddit/HN/Twitter), not editorial articles
+  - Worth Reading links ONLY include URLs you actually retrieved from search results - never constructed or guessed
+  - Every Reddit URL was verified in search results and leads to a real finance discussion thread
   - All source URLs came from your searches
 
 Replace ALL placeholders with real content. Return ONLY complete HTML starting with <!DOCTYPE html>.
@@ -331,16 +345,20 @@ SIGNAL BLOCK PATTERN - use for every signal:
   <p style="margin:0 0 6px;font-size:14px;font-weight:600;color:#1c1c1e;">[HEADLINE - 10 words max, specific]</p>
   <p style="margin:0 0 8px;font-size:13px;color:#3a3a3c;line-height:1.6;">[BODY - what happened and why it matters to Bharosa specifically]</p>
   <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#34c759;">-> [ACTION - concrete thing Bharosa should do or build]</p>
-  <p style="margin:0;font-size:11px;color:#aeaeb2;"><a href="[REAL_SOURCE_URL]" style="color:#007aff;text-decoration:none;">[source domain]</a></p>
+  <p style="margin:0;font-size:11px;color:#aeaeb2;"><a href="[REAL_SOURCE_URL_FROM_SEARCH_RESULTS_ONLY]" style="color:#007aff;text-decoration:none;">[source domain]</a></p>
 </td></tr>
 </table>
 
 Badge colours: THREAT bg=#3a0e0e text=#ff6b6b / BUILD bg=#0a2e1a text=#34c759 / WATCH bg=#2e2200 text=#ff9f0a / INFO bg=#001a2e text=#0a84ff
 
 WORTH READING ITEM PATTERN:
+IMPORTANT: Only include a link if the URL appeared verbatim in your search results.
+Never construct or guess a URL. If uncertain, omit the item entirely.
+Allowed subreddits: r/IndiaInvestments, r/personalfinanceindia, r/mutualfunds, r/FIREIndia, r/IndiaStocks, r/tax, r/Bogleheads, r/personalfinance, r/financialindependence only.
+
 <p style="margin:0 0 12px;font-size:14px;line-height:1.6;">
   <span style="background:[PLATFORM_BG];color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:6px;">[PLATFORM]</span>
-  <a href="[REAL_THREAD_URL]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title]</a><br>
+  <a href="[REAL_THREAD_URL_FROM_SEARCH_RESULTS_ONLY]" style="color:#007aff;text-decoration:none;font-weight:600;">[Thread title - exact title from search result]</a><br>
   <span style="font-size:12px;color:#8e8e93;">[Why read - one line]</span>
 </p>
 Platform bg: Reddit #ff4500 / HN #ff6600 / X #000000
@@ -379,8 +397,8 @@ def generate_briefing() -> str:
     day       = now.strftime("%A")
     is_monday = now.weekday() == 0
 
-    covered_topics   = load_coverage_log()
-    coverage_context = format_coverage_context(covered_topics)
+    covered_topics     = load_coverage_log()
+    coverage_context   = format_coverage_context(covered_topics)
     monday_instruction = MONDAY_INSTRUCTION if is_monday else ""
 
     print(f"[briefing] Generating {day}, {date}{' (Monday edition)' if is_monday else ''} ...")
